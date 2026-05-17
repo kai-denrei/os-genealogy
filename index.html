@@ -211,6 +211,68 @@
   .chip[data-house="mobile"].active    { background: var(--c-mobile);    border-color: var(--c-mobile); }
   .chip-all.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ LAYER TOGGLE — The Free Peoples                           │
+     │ A confederation toggle distinct from the house filter.    │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .layer-toggle {
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--faint);
+    color: var(--text-2);
+    padding: 5px 14px 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+    border-radius: 1px;
+    margin-left: 10px;
+  }
+  .layer-toggle:hover { background: var(--panel); }
+  .layer-toggle:focus-visible { outline: 1px solid var(--accent-2); outline-offset: 2px; }
+  .layer-toggle .layer-mark {
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--muted);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .layer-toggle .layer-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.05;
+    gap: 1px;
+  }
+  .layer-toggle .layer-title {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+    letter-spacing: 0;
+  }
+  .layer-toggle .layer-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .layer-toggle[aria-pressed="true"] {
+    border-color: var(--accent-2);
+    border-left-color: var(--accent-2);
+    color: var(--text);
+  }
+  .layer-toggle[aria-pressed="true"] .layer-mark {
+    background: var(--accent-2);
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.18);
+  }
+  .layer-toggle[aria-pressed="true"] .layer-title { color: var(--accent-2); }
+
   .search {
     margin-left: auto;
     display: flex;
@@ -313,7 +375,11 @@
   .lineage-line.highlight { opacity: 1; stroke-width: 1.8; }
   .lineage-line.highlight.dashed { opacity: 0.9; }
 
-  .os-bar-group { cursor: pointer; }
+  .os-bar-group {
+    cursor: pointer;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+                opacity 0.35s ease;
+  }
   .os-bar-bg { fill: var(--panel-2); transition: fill 0.15s ease; }
   .os-bar {
     fill-opacity: 0.18;
@@ -324,6 +390,34 @@
   .os-bar-group.selected .os-bar { fill-opacity: 0.5; stroke-width: 1.8; }
   .os-bar-group.dim { opacity: 0.18; }
   .os-bar-group.lineage .os-bar { fill-opacity: 0.42; stroke-width: 1.6; }
+
+  /* ─── Movement layer (The Free Peoples) ───
+     Non-movement bars are at their LAYOUT_OFF position; on toggle, they
+     translate to LAYOUT_ON via --delta-y. Movement bars are pre-positioned
+     at LAYOUT_ON and fade in. */
+  body.layer-on .os-bar-group { transform: translateY(var(--delta-y, 0)); }
+  .os-bar-group.movement {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .os-bar-group.movement .os-bar {
+    fill-opacity: 0.08;
+    stroke-width: 1.3;
+    stroke-dasharray: 3 2.5;
+  }
+  .os-bar-group.movement:hover .os-bar { fill-opacity: 0.28; stroke-width: 1.6; }
+  body.layer-on .os-bar-group.movement {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Lineage lines that touch a movement endpoint */
+  .lineage-line.lineage-movement { opacity: 0; }
+  body.layer-on .lineage-line.lineage-movement { opacity: 0.28; }
+  body.layer-on .lineage-line.lineage-movement.dashed { opacity: 0.22; }
+  body.layer-on .lineage-line.lineage-movement.highlight { opacity: 1; }
+
+  /* Chart-wrap height transitions to match SVG growth on toggle */
+  .chart-wrap { transition: height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
   .os-label {
     font-family: var(--mono);
@@ -393,6 +487,45 @@
     height: 8px;
     border-radius: 50%;
     background: var(--accent);
+  }
+  .detail-movement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border: 1px solid var(--rule-2);
+    border-left: 2px solid var(--accent-2);
+    color: var(--text-2);
+    margin: 0 0 14px;
+  }
+  .detail-movement-badge .clade-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .detail-movement-badge .free-peoples {
+    color: var(--accent-2);
+    font-style: italic;
+    font-family: var(--serif-display);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  .detail-movement-note {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-2);
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border-left: 2px solid var(--accent-2);
+    background: rgba(94, 234, 212, 0.04);
   }
   .detail-name {
     font-family: var(--serif-display);
@@ -529,6 +662,76 @@
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 22px 28px;
     margin-bottom: 36px;
+  }
+  /* Clade legend — only visible when layer is on */
+  .clade-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.4s ease, margin 0.4s ease;
+    margin: 0;
+  }
+  body.layer-on .clade-section {
+    max-height: 800px;
+    opacity: 1;
+    margin: 0 0 36px;
+  }
+  .clade-section h3 {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    margin: 0 0 4px;
+    color: var(--accent-2);
+  }
+  .clade-section .clade-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  .clade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px 22px;
+  }
+  .clade-row {
+    display: grid;
+    grid-template-columns: 10px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .clade-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.4);
+  }
+  .clade-name {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 15px;
+    margin: 0;
+  }
+  .clade-name .count {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .clade-motto {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 12.5px;
+    color: var(--text-2);
+    margin-top: 1px;
+    line-height: 1.4;
   }
   .legend-row {
     display: grid;
@@ -725,6 +928,15 @@
     .search { margin-left: 0; width: 100%; padding: 9px 12px; }
     .search input { width: 100%; font-size: 14px; }
 
+    .layer-toggle {
+      margin-left: 0;
+      align-self: stretch;
+      justify-content: flex-start;
+      padding: 8px 12px 8px 10px;
+    }
+    .layer-toggle .layer-title { font-size: 15px; }
+    .layer-toggle .layer-sub { font-size: 9px; }
+
     .footer-section {
       padding: 36px 18px 56px;
       padding-left: max(18px, env(safe-area-inset-left));
@@ -848,6 +1060,14 @@
     <button class="chip" data-house="altpc">Exiles</button>
     <button class="chip" data-house="mobile">Pocket</button>
   </div>
+  <button class="layer-toggle" id="layerToggle" type="button" aria-pressed="false"
+          aria-label="Toggle The Free Peoples — the open source movements layer">
+    <span class="layer-mark" aria-hidden="true"></span>
+    <span class="layer-stack">
+      <span class="layer-title">The Free Peoples</span>
+      <span class="layer-sub">the open source movements</span>
+    </span>
+  </button>
   <label class="search">
     <span class="icon">⌕</span>
     <input id="searchInput" type="text" placeholder="search for an OS…" autocomplete="off" spellcheck="false">
@@ -866,6 +1086,12 @@
 <section class="footer-section">
   <h2>The Houses</h2>
   <div class="legend-grid" id="legendGrid"></div>
+
+  <div class="clade-section" id="cladeSection" aria-hidden="true">
+    <h3>The Free Peoples</h3>
+    <p class="clade-sub">A confederation, not a house — orthogonal membership.</p>
+    <div class="clade-grid" id="cladeGrid"></div>
+  </div>
 
   <div class="reading-guide">
     <div>
@@ -920,6 +1146,34 @@ const HOUSES = {
     motto: 'Crowns small enough to fit in a pocket.' },
 };
 
+// ─── CLADES — The Free Peoples ──────────────────────────────
+// A toggleable confederation orthogonal to the houses: projects that
+// refused vendor capture, sat outside the dynastic high table, or
+// argued from a position of code rather than market share.
+const CLADES = {
+  fsf:            { name: 'The Free Software Clade',      short: 'FSF',           accent: '#a3e635',
+    motto: 'Rebuild Unix as freedom; ship a kernel anyway.' },
+  'bell-labs':    { name: 'The Bell Labs Apostates',      short: 'Bell Labs',     accent: '#fbbf24',
+    motto: 'What Unix should have been. Still arguing the case.' },
+  privacy:        { name: 'The Privacy Purists',          short: 'Privacy',       accent: '#f87171',
+    motto: 'Threat model first. Convenience never.' },
+  'anti-systemd': { name: 'The Anti-systemd Schism',      short: 'Anti-systemd',  accent: '#fb923c',
+    motto: 'Forked over an init system. Survived.' },
+  'mobile-rebel': { name: 'The Mobile Rebels',            short: 'Mobile rebels', accent: '#f0abfc',
+    motto: 'A phone OS that is not Google or Apple.' },
+  'from-scratch': { name: 'The From-Scratch Idealists',   short: 'From scratch',  accent: '#a78bfa',
+    motto: 'Begin again. Borrow nothing.' },
+  microkernel:    { name: 'The Microkernel Holdouts',     short: 'Microkernel',   accent: '#67e8f9',
+    motto: 'Tanenbaum was right; we are still patient.' },
+  immutable:      { name: 'The Immutable Wave',           short: 'Immutable',     accent: '#5eead4',
+    motto: 'Declarative, reproducible, atomic.' },
+  'market-rebel': { name: 'The Market Rebels',            short: 'Market',        accent: '#c4b5fd',
+    motto: 'Linux on hardware people actually buy.' },
+  eschaton:       { name: 'The Eschatologists',           short: 'Eschaton',      accent: '#8a8373',
+    motto: 'For the long descent, and after.' },
+};
+const CLADE_ORDER = ['fsf','bell-labs','privacy','anti-systemd','mobile-rebel','from-scratch','microkernel','immutable','market-rebel','eschaton'];
+
 const OSES = [
   // ─── MAINFRAME ───────────────────────────────────────────────
   { id:'multics', name:'Multics',          house:'mainframe', born:1969, ended:2000, parents:[], company:'MIT · Bell Labs · GE',
@@ -965,6 +1219,7 @@ const OSES = [
   { id:'irix',    name:'IRIX',             house:'unix', born:1988, ended:2006, parents:[{id:'sysV',rel:'derived'}], company:'Silicon Graphics',
     note:'Once ran Jurassic Park’s VFX. The Hollywood Unix.' },
   { id:'minix',   name:'Minix',            house:'unix', born:1987, ended:null, parents:[{id:'unixv7',rel:'inspired'}], company:'Andrew Tanenbaum',
+    movement:true, clade:'microkernel',
     note:'A teaching Unix, written from scratch. Linus read this code first.' },
   { id:'svr4',    name:'UNIX SVR4',        house:'unix', born:1988, ended:1992,
     parents:[{id:'sysV',rel:'derived'},{id:'bsd43',rel:'merge'},{id:'sunos',rel:'merge'},{id:'xenix',rel:'merge'}],
@@ -974,6 +1229,7 @@ const OSES = [
     parents:[{id:'sunos',rel:'derived'},{id:'svr4',rel:'merge'}], company:'Sun · Oracle',
     note:'Solaris 10 introduced DTrace and ZFS — gifts the rest of computing is still unwrapping.' },
   { id:'plan9',   name:'Plan 9',           house:'unix', born:1992, ended:null, parents:[{id:'unixv7',rel:'inspired'}], company:'Bell Labs',
+    movement:true, clade:'bell-labs',
     note:'What Unix should have been, written by the same people. Beautiful, beloved, ignored.' },
   { id:'qnx',     name:'QNX',              house:'unix', born:1982, ended:null, parents:[{id:'unixv7',rel:'inspired'}], company:'QSSL · BlackBerry',
     note:'A microkernel Unix that quietly conquered cars, nuclear plants, and the Hubble.' },
@@ -1085,6 +1341,7 @@ const OSES = [
   { id:'drdos',    name:'DR-DOS',           house:'dos', born:1988, ended:null, parents:[{id:'cpm',rel:'derived'}], company:'Digital Research · Caldera',
     note:'The DOS that wasn’t Microsoft’s. Antitrust history hinges on its sabotage.' },
   { id:'freedos',  name:'FreeDOS',          house:'dos', born:1994, ended:null, parents:[{id:'msdos',rel:'inspired'}], company:'Jim Hall et al.',
+    movement:true, clade:'from-scratch',
     note:'A clean-room DOS that outlived both MS-DOS and PC DOS. BIOS flashers still ship with it.' },
   { id:'win1',     name:'Windows 1.0',      house:'dos', born:1985, ended:1988, parents:[{id:'msdos',rel:'derived'}], company:'Microsoft',
     note:'A tiled shell over DOS. Mocked at the time, vindicated by every subsequent year.' },
@@ -1143,8 +1400,10 @@ const OSES = [
   { id:'beos',     name:'BeOS',             house:'altpc', born:1995, ended:2001, parents:[], company:'Be Inc.',
     note:'Multimedia OS with a famous file system. Apple nearly bought it instead of NeXT.' },
   { id:'haiku',    name:'Haiku',            house:'altpc', born:2001, ended:null, parents:[{id:'beos',rel:'derived'}], company:'Haiku Inc.',
+    movement:true, clade:'from-scratch',
     note:'A clean-room BeOS reimplementation. Still in beta, still ticking.' },
   { id:'reactos',  name:'ReactOS',          house:'altpc', born:1996, ended:null, parents:[{id:'nt4',rel:'inspired'}], company:'ReactOS Project',
+    movement:true, clade:'from-scratch',
     note:'A clean-room Windows NT clone. Permanently almost-ready.' },
 
   // ─── MOBILE / EMBEDDED ───────────────────────────────────────
@@ -1161,16 +1420,255 @@ const OSES = [
     note:'A Samsung-only OS. Folded into Tizen.' },
   { id:'tizen',    name:'Tizen',            house:'mobile', born:2012, ended:null,
     parents:[{id:'bada',rel:'merge'},{id:'linux',rel:'derived'}], company:'Linux Foundation · Samsung',
+    movement:true, clade:'mobile-rebel',
     note:'Watches, TVs, refrigerators. Not phones.' },
   { id:'bb10',     name:'BlackBerry 10',    house:'mobile', born:2013, ended:2018,
     parents:[{id:'qnx',rel:'derived'},{id:'bbos',rel:'inspired'}], company:'BlackBerry',
     note:'QNX under the hood. Beautiful, late, doomed.' },
   { id:'firefoxos',name:'Firefox OS',       house:'mobile', born:2013, ended:2016, parents:[{id:'linux',rel:'derived'}], company:'Mozilla',
+    movement:true, clade:'mobile-rebel',
     note:'Web apps as the entire OS. Discontinued; the idea survives in feature phones.' },
   { id:'kaios',    name:'KaiOS',            house:'mobile', born:2017, ended:null, parents:[{id:'firefoxos',rel:'derived'}], company:'KaiOS Technologies',
+    movement:true, clade:'mobile-rebel',
     note:'Firefox OS, reborn for the JioPhone era. Hundreds of millions of feature-phone seats.' },
   { id:'harmonyos',name:'HarmonyOS',        house:'mobile', born:2019, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Huawei',
     note:'Began as Android-adjacent under sanctions. HarmonyOS NEXT (2024) drops Linux entirely. The newest schism.' },
+
+  // ════════════════════════════════════════════════════════════════
+  //  THE FREE PEOPLES — toggleable layer
+  //  Members keep their natural house; the `movement` flag is the
+  //  orthogonal axis. `clade` identifies which sub-movement they sit in.
+  // ════════════════════════════════════════════════════════════════
+
+  // ─── The Free Software Clade (FSF orthodoxy) ─────────────────
+  { id:'gnu',       name:'GNU',                          house:'unix',  born:1983, ended:null,
+    parents:[{id:'unixv7',rel:'inspired'}], company:'FSF · Stallman',
+    movement:true, clade:'fsf',
+    note:'The 1983 manifesto: rebuild Unix as free software. Userland shipped — gcc, glibc, bash, coreutils became the substrate of every Linux distribution. The kernel did not.' },
+  { id:'hurd',      name:'GNU Hurd',                     house:'unix',  born:1990, ended:null,
+    parents:[{id:'gnu',rel:'derived'},{id:'mach',rel:'inspired'}], company:'FSF',
+    movement:true, clade:'fsf',
+    note:'The unfinished prophecy. Pre-alpha for thirty-five years. The microkernel approach was right; the timing was not.' },
+  { id:'trisquel',  name:'Trisquel',                     house:'linux', born:2004, ended:null,
+    parents:[{id:'ubuntu',rel:'derived'}], company:'Trisquel Project · Galicia',
+    movement:true, clade:'fsf',
+    note:'FSF-endorsed Ubuntu with the binary blobs scraped out. The most-installed of the FSF list.' },
+  { id:'gnewsense', name:'gNewSense',                    house:'linux', born:2006, ended:2017,
+    parents:[{id:'debian',rel:'derived'},{id:'ubuntu',rel:'derived'}], company:'FSF · Shuttleworth (early funding)',
+    movement:true, clade:'fsf',
+    note:'FSF-endorsed Debian/Ubuntu variant. Funded in part by Mark Shuttleworth — one of the few cases of a Linux founder funding the FSF-purist alternative to his own distro. Discontinued 2017.' },
+  { id:'parabola',  name:'Parabola GNU/Linux-libre',     house:'linux', born:2009, ended:null,
+    parents:[{id:'arch',rel:'derived'}], company:'Parabola Project',
+    movement:true, clade:'fsf',
+    note:'Arch with proprietary firmware removed and the Linux-libre kernel substituted. FSF-endorsed since 2011.' },
+  { id:'hyperbola', name:'Hyperbola',                    house:'linux', born:2017, ended:null,
+    parents:[{id:'arch',rel:'derived'},{id:'debian',rel:'inspired'}], company:'Hyperbola Project · Brazil',
+    movement:true, clade:'fsf',
+    movementNote:'Began 2017 as a libre Arch derivative. In December 2019 announced it would cease to be Linux and become HyperbolaBSD — rejecting Linux for HDCP/DRM, Rust, and systemd. The only OS to leave Linux for ideological reasons.',
+    note:'FSF-endorsed since 2018. Now mid-migration from Linux to a libre fork of OpenBSD.' },
+  { id:'guix',      name:'Guix System',                  house:'linux', born:2013, ended:null,
+    parents:[{id:'gnu',rel:'derived'},{id:'nixos',rel:'inspired'}], company:'GNU Project',
+    movement:true, clade:'fsf',
+    note:'Functional, declarative, reproducible — Nix’s ideas re-implemented in Guile Scheme under GNU’s wing. The cleanest synthesis of FSF orthodoxy and the immutable wave.' },
+  { id:'replicant', name:'Replicant',                    house:'mobile', born:2010, ended:null,
+    parents:[{id:'android',rel:'derived'}], company:'Replicant Project · FSF',
+    movement:true, clade:'fsf',
+    note:'FSF’s mobile flag-plant: Android with every blob removed. The trade-off is severe — most phones lose camera, modem, or Wi-Fi — and the project’s reach is correspondingly small.' },
+
+  // ─── The Bell Labs Apostates ─────────────────────────────────
+  { id:'inferno',   name:'Inferno',                      house:'unix',  born:1996, ended:null,
+    parents:[{id:'plan9',rel:'derived'}], company:'Bell Labs · later Vita Nuova',
+    movement:true, clade:'bell-labs',
+    note:'Plan 9’s portable child: a virtual-machine OS (Limbo language, Dis VM) intended to run anywhere. Sold to Vita Nuova; later open-sourced.' },
+  { id:'9front',    name:'9front',                       house:'unix',  born:2011, ended:null,
+    parents:[{id:'plan9',rel:'forked'}], company:'community',
+    movement:true, clade:'bell-labs',
+    note:'The community fork that keeps Plan 9 alive after Bell Labs stopped. Active development, dadaist release notes, working modern hardware support.' },
+
+  // ─── The Privacy Purists ─────────────────────────────────────
+  { id:'tails',     name:'Tails',                        house:'linux', born:2009, ended:null,
+    parents:[{id:'debian',rel:'derived'}], company:'Tails Project · funded by Tor, EFF, others',
+    movement:true, clade:'privacy',
+    note:'The Amnesic Incognito Live System. Boots from USB, routes through Tor, forgets everything on shutdown. Snowden’s choice.' },
+  { id:'qubes',     name:'Qubes OS',                     house:'linux', born:2012, ended:null,
+    parents:[{id:'fedora',rel:'derived'}], company:'Invisible Things Lab · Rutkowska',
+    movement:true, clade:'privacy',
+    note:'Security by compartmentalisation: each task in its own Xen-isolated VM. A genuinely original architecture, not a hardened distro. Joanna Rutkowska’s design.' },
+  { id:'whonix',    name:'Whonix',                       house:'linux', born:2012, ended:null,
+    parents:[{id:'debian',rel:'derived'}], company:'Whonix Project',
+    movement:true, clade:'privacy',
+    note:'Two VMs: one workstation, one Tor gateway. Network isolation enforced architecturally. Often run inside Qubes.' },
+  { id:'subgraph',  name:'Subgraph OS',                  house:'linux', born:2014, ended:2017,
+    parents:[{id:'debian',rel:'derived'}], company:'Subgraph',
+    movement:true, clade:'privacy',
+    note:'Hardened Debian with mandatory application sandboxing and Tor by default. Active development effectively stopped after 2017.' },
+
+  // ─── The Anti-systemd Schism ─────────────────────────────────
+  { id:'alpine',    name:'Alpine Linux',                 house:'linux', born:2005, ended:null,
+    parents:[{id:'gentoo',rel:'inspired'}], company:'Alpine Linux Development Team',
+    movement:true, clade:'anti-systemd',
+    note:'musl libc, busybox userland, OpenRC init, apk package manager. The container-image substrate of choice — small, fast, no glibc, no systemd. Originated from LEAF Linux.' },
+  { id:'void',      name:'Void Linux',                   house:'linux', born:2008, ended:null,
+    parents:[{id:'gentoo',rel:'inspired'}], company:'Void Linux project',
+    movement:true, clade:'anti-systemd',
+    note:'Rolling release, runit init, xbps package manager. Written from scratch, not forked. The principled middle path between Arch and Slackware.' },
+  { id:'devuan',    name:'Devuan',                       house:'linux', born:2014, ended:null,
+    parents:[{id:'debian',rel:'forked'}], company:'Devuan Project · "Veteran Unix Admins"',
+    movement:true, clade:'anti-systemd',
+    movementNote:'Forked from Debian in November 2014 in explicit protest at Debian’s adoption of systemd. The only major operating system in history forked over an init system. First stable release “Jessie” April 2017.',
+    note:'Debian without systemd. Default init is sysvinit; OpenRC and runit are supported alternatives.' },
+  { id:'antix',     name:'antiX',                        house:'linux', born:2007, ended:null,
+    parents:[{id:'debian',rel:'derived'}], company:'antiX project · Greece',
+    movement:true, clade:'anti-systemd',
+    note:'Lightweight, systemd-free Debian derivative aimed at older hardware. Predates the explicit anti-systemd movement but became part of it.' },
+  { id:'artix',     name:'Artix Linux',                  house:'linux', born:2017, ended:null,
+    parents:[{id:'arch',rel:'forked'}], company:'Artix project',
+    movement:true, clade:'anti-systemd',
+    note:'Arch without systemd. Supports OpenRC, runit, s6, dinit. The Arch-side counterpart to Devuan.' },
+
+  // ─── The Mobile Rebels ───────────────────────────────────────
+  { id:'maemo',     name:'Maemo',                        house:'mobile', born:2005, ended:2010,
+    parents:[{id:'debian',rel:'derived'}], company:'Nokia',
+    movement:true, clade:'mobile-rebel',
+    note:'Nokia’s Debian-based Linux for the 770/N800/N900 tablets. A genuine open Linux phone OS — and the one that produced the N900, still revered.' },
+  { id:'meego',     name:'MeeGo',                        house:'mobile', born:2010, ended:2012,
+    parents:[{id:'maemo',rel:'derived'},{id:'fedora',rel:'derived'}], company:'Nokia + Intel · Linux Foundation',
+    movement:true, clade:'mobile-rebel',
+    note:'Maemo (Debian-based) merged with Intel’s Moblin (Fedora-based). Killed when Nokia’s Elop chose Windows Phone in 2011. One handset shipped, the N9 — perhaps the most-loved mobile OS that never had a second chance.' },
+  { id:'sailfish',  name:'Sailfish OS',                  house:'mobile', born:2013, ended:null,
+    parents:[{id:'meego',rel:'derived'}], company:'Jolla · Finland',
+    movement:true, clade:'mobile-rebel',
+    note:'MeeGo’s continuation by ex-Nokia engineers. Still shipping. Russian government adopted it for state phones in the late 2010s — a strange afterlife.' },
+  { id:'ubuntu-touch', name:'Ubuntu Touch',              house:'mobile', born:2013, ended:2017,
+    parents:[{id:'ubuntu',rel:'derived'}], company:'Canonical',
+    movement:true, clade:'mobile-rebel',
+    note:'Canonical’s mobile bet on convergence — phone + desktop in one OS. Abandoned April 2017 along with the Unity 8 / Mir stack.' },
+  { id:'ubports',   name:'UBports',                      house:'mobile', born:2017, ended:null,
+    parents:[{id:'ubuntu-touch',rel:'forked'}], company:'UBports Foundation',
+    movement:true, clade:'mobile-rebel',
+    note:'Community continuation of Ubuntu Touch after Canonical’s exit. Active, releases regular, runs on PinePhone.' },
+  { id:'postmarketos', name:'postmarketOS',              house:'mobile', born:2017, ended:null,
+    parents:[{id:'alpine',rel:'derived'}], company:'postmarketOS community',
+    movement:true, clade:'mobile-rebel',
+    note:'Alpine Linux for old phones. Goal: a real Linux distribution on mobile, with a ten-year support lifespan. Possibly the most idealistic project in this clade.' },
+  { id:'cyanogenmod', name:'CyanogenMod',                house:'mobile', born:2009, ended:2016,
+    parents:[{id:'android',rel:'forked'}], company:'CyanogenMod community → Cyanogen Inc.',
+    movement:true, clade:'mobile-rebel',
+    note:'The original de-Googled Android. Community fork that grew enormous, became a startup, imploded around 2016.' },
+  { id:'lineageos', name:'LineageOS',                    house:'mobile', born:2016, ended:null,
+    parents:[{id:'cyanogenmod',rel:'forked'}], company:'LineageOS community',
+    movement:true, clade:'mobile-rebel',
+    note:'CyanogenMod’s community resurrection after Cyanogen Inc. collapsed. Most-used custom Android distribution.' },
+  { id:'grapheneos', name:'GrapheneOS',                  house:'mobile', born:2014, ended:null,
+    parents:[{id:'android',rel:'derived'}], company:'GrapheneOS · Daniel Micay',
+    movement:true, clade:'mobile-rebel',
+    movementNote:'Began 2014 as CopperheadOS; rebranded GrapheneOS in 2019 after a split between Daniel Micay and Copperhead Limited.',
+    note:'Hardened, de-Googled Android focused on real security guarantees, not just feature removal. Pixel-only.' },
+  { id:'calyxos',   name:'CalyxOS',                      house:'mobile', born:2018, ended:null,
+    parents:[{id:'android',rel:'derived'}], company:'Calyx Institute',
+    movement:true, clade:'mobile-rebel',
+    note:'Privacy-focused Android with microG for de-Googling, run by a non-profit. Less paranoid about hardware than GrapheneOS.' },
+  { id:'eos-murena', name:'/e/OS · Murena',              house:'mobile', born:2018, ended:null,
+    parents:[{id:'lineageos',rel:'derived'}], company:'Murena · Gaël Duval',
+    movement:true, clade:'mobile-rebel',
+    note:'Gaël Duval (Mandrake founder) re-enters the OS world with a fully de-Googled Android plus cloud replacement. Ships on actual phones.' },
+  { id:'pureos',    name:'PureOS',                       house:'linux', born:2017, ended:null,
+    parents:[{id:'debian',rel:'derived'}], company:'Purism',
+    movement:true, clade:'mobile-rebel',
+    note:'FSF-endorsed Debian variant that ships on Purism’s Librem laptops and the Librem 5 phone. Cross-clade with FSF and mobile-rebel.' },
+
+  // ─── The From-Scratch Idealists ──────────────────────────────
+  { id:'temple-os', name:'TempleOS',                     house:'altpc', born:2003, ended:2013,
+    parents:[], company:'Terry A. Davis',
+    movement:true, clade:'from-scratch',
+    note:'Singular case. Written entirely by one person over a decade as a “third temple”, with its own language (HolyC), 640×480 16-colour graphics, and a Bible random-walk oracle. Public domain. Davis died 2018; the OS remains.' },
+  { id:'serenityos', name:'SerenityOS',                  house:'altpc', born:2018, ended:null,
+    parents:[{id:'unixv7',rel:'inspired'}], company:'Andreas Kling et al.',
+    movement:true, clade:'from-scratch',
+    note:'A Unix-like OS written entirely from scratch — kernel, userland, browser (LibWeb → Ladybird), all of it — in modern C++. Explicit “for the love of it” project. Has spawned an independent browser engine.' },
+  { id:'redox',     name:'Redox OS',                     house:'altpc', born:2015, ended:null,
+    parents:[{id:'plan9',rel:'inspired'},{id:'minix',rel:'inspired'}], company:'Redox OS · Jeremy Soller',
+    movement:true, clade:'from-scratch',
+    note:'Microkernel OS in Rust. Crosses with from-scratch and microkernel clades. The most credible candidate for a memory-safe operating system from below.' },
+
+  // ─── The Microkernel Holdouts ────────────────────────────────
+  { id:'minix3',    name:'Minix 3',                      house:'unix',  born:2005, ended:null,
+    parents:[{id:'minix',rel:'derived'}], company:'Tanenbaum · Vrije Universiteit Amsterdam',
+    movement:true, clade:'microkernel',
+    note:'Tanenbaum’s microkernel comeback — production-targeted, not educational. Quietly the most-deployed OS in the world: Intel ships it as the Management Engine firmware on every modern x86 chip. A dark joke about the Tanenbaum–Torvalds debate.' },
+  { id:'genode',    name:'Genode',                       house:'altpc', born:2008, ended:null,
+    parents:[], company:'Genode Labs · Germany',
+    movement:true, clade:'microkernel',
+    note:'An OS framework that runs on a dozen different microkernels (L4, seL4, NOVA, Fiasco). Their Sculpt distribution is an actual usable desktop.' },
+  { id:'sel4',      name:'seL4',                         house:'unix',  born:2009, ended:null,
+    parents:[], company:'NICTA · UNSW · later Trustworthy Systems',
+    movement:true, clade:'microkernel',
+    note:'The first general-purpose microkernel with a complete mathematical proof of correctness. Used in real high-assurance systems, including some autonomous vehicles.' },
+  { id:'helenos',   name:'HelenOS',                      house:'altpc', born:2001, ended:null,
+    parents:[], company:'HelenOS project',
+    movement:true, clade:'microkernel',
+    note:'Multiserver microkernel OS started at Charles University, Prague. Quietly active for a quarter-century.' },
+
+  // ─── The Immutable Wave ──────────────────────────────────────
+  { id:'nixos',     name:'NixOS',                        house:'linux', born:2003, ended:null,
+    parents:[], company:'Eelco Dolstra (PhD thesis) → NixOS Foundation',
+    movement:true, clade:'immutable',
+    note:'Declarative, functional, reproducible. Origin of the modern immutable-OS argument. Born as Dolstra’s 2003 PhD work; first stable release 2007. Now seeds an entire sub-movement.' },
+  { id:'silverblue', name:'Fedora Silverblue',           house:'linux', born:2018, ended:null,
+    parents:[{id:'fedora',rel:'derived'}], company:'Red Hat · Fedora Project',
+    movement:true, clade:'immutable',
+    note:'Fedora’s immutable variant using rpm-ostree and Flatpak/Toolbox. The corporate-blessed immutable Linux. Spawned the Universal Blue ecosystem.' },
+  { id:'microos',   name:'openSUSE MicroOS',             house:'linux', born:2018, ended:null,
+    parents:[{id:'suse',rel:'derived'}], company:'SUSE · openSUSE Project',
+    movement:true, clade:'immutable',
+    note:'SUSE’s transactional-update immutable system. Aeon and Kalpa are its desktop variants. The German-engineering wing of immutability.' },
+  { id:'vanilla-os', name:'Vanilla OS',                  house:'linux', born:2022, ended:null,
+    parents:[{id:'ubuntu',rel:'derived'},{id:'debian',rel:'derived'}], company:'Vanilla OS · Mirko Brombin',
+    movement:true, clade:'immutable',
+    movementNote:'First release 22.10 in December 2022, originally Ubuntu-based. Vanilla OS 2.0 “Orchid” (July 2024) switched the base to Debian Sid. Atomic A/B updates, apx sandboxed package manager.',
+    note:'Immutable Linux for non-expert users. Notable for swapping its upstream base mid-project — Ubuntu out, Debian in.' },
+  { id:'bluefin',   name:'Bluefin',                      house:'linux', born:2023, ended:null,
+    parents:[{id:'silverblue',rel:'derived'}], company:'Universal Blue',
+    movement:true, clade:'immutable',
+    note:'Universal Blue’s developer-and-creator-targeted image. “The Chromebook of Linux workstations.” Built atop Fedora Silverblue with bootc.' },
+  { id:'bazzite',   name:'Bazzite',                      house:'linux', born:2023, ended:null,
+    parents:[{id:'silverblue',rel:'derived'},{id:'steamos3',rel:'inspired'}], company:'Universal Blue',
+    movement:true, clade:'immutable',
+    movementNote:'First release November 2023, based on Fedora 38. The mineral “bazzite” forms small blue crystals — naming consistent with Universal Blue. Cross-clade with market-rebel.',
+    note:'Universal Blue’s gaming-handheld-and-desktop image. SteamOS-like experience, Fedora base.' },
+
+  // ─── The Market Rebels ───────────────────────────────────────
+  { id:'steamos1',  name:'SteamOS 1–2',                  house:'linux', born:2013, ended:2019,
+    parents:[{id:'debian',rel:'derived'}], company:'Valve',
+    movement:true, clade:'market-rebel',
+    note:'Valve’s first attempt: Debian-based, aimed at the Steam Machines initiative. The hardware initiative failed; the OS quietly continued.' },
+  { id:'steamos3',  name:'SteamOS 3',                    house:'linux', born:2022, ended:null,
+    parents:[{id:'arch',rel:'derived'}], company:'Valve',
+    movement:true, clade:'market-rebel',
+    movementNote:'Released February 2022 with the Steam Deck. Switched base from Debian to Arch. Immutable A/B root filesystem.',
+    note:'The Steam Deck’s OS. Arch-based, immutable, KDE Plasma, Proton-mediated Windows game compatibility. The most consequential Linux desktop release since Ubuntu.' },
+  { id:'holoiso',   name:'HoloISO',                      house:'linux', born:2022, ended:null,
+    parents:[{id:'steamos3',rel:'derived'}], company:'community',
+    movement:true, clade:'market-rebel',
+    note:'Community reimplementation packaging SteamOS 3 for non-Deck hardware. A bootleg-but-tolerated continuation.' },
+  { id:'chimeraos', name:'ChimeraOS',                    house:'linux', born:2019, ended:null,
+    parents:[{id:'arch',rel:'derived'}], company:'ChimeraOS community',
+    movement:true, clade:'market-rebel',
+    note:'Originally GamerOS. Arch-based, Steam-Big-Picture-first, predates the Steam Deck’s SteamOS 3 with a similar goal.' },
+  { id:'popos',     name:'Pop!_OS',                      house:'linux', born:2017, ended:null,
+    parents:[{id:'ubuntu',rel:'derived'}], company:'System76',
+    movement:true, clade:'market-rebel',
+    note:'System76’s Ubuntu derivative, born when Canonical retreated from desktop. Auto-tiling, custom installer, COSMIC desktop (their from-scratch Rust DE).' },
+
+  // ─── The Eschatologists ──────────────────────────────────────
+  { id:'collapse-os', name:'Collapse OS',                house:'altpc', born:2019, ended:null,
+    parents:[], company:'Virgil Dupras',
+    movement:true, clade:'eschaton',
+    note:'Designed to be bootstrapped on scavenged hardware after civilisational collapse. Forth, z80, minimal. Documentation as artefact.' },
+  { id:'dusk-os',   name:'Dusk OS',                      house:'altpc', born:2022, ended:null,
+    parents:[{id:'collapse-os',rel:'derived'}], company:'Virgil Dupras',
+    movement:true, clade:'eschaton',
+    note:'Collapse OS’s successor — same author, broader target (32-bit), still Forth-rooted. Intended as the “dusk” OS for the long descent, not the post-apocalypse.' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1217,38 +1715,39 @@ function buildIndex() {
 
 const { byId, childrenOf } = buildIndex();
 
-function packHouses() {
+// Greedy lane packer — sorts each house's OSES by birth year then assigns
+// each to the first row whose previous entry has ended. Pure: returns
+// row assignments in an object keyed by id, does not mutate OS records.
+function packHouses(includeMovement) {
   const layouts = {};
   for (const house of HOUSE_ORDER) {
     const oses = OSES
-      .filter(o => o.house === house)
+      .filter(o => o.house === house && (includeMovement || !o.movement))
       .sort((a, b) => a.born - b.born || a.id.localeCompare(b.id));
-    const rowsLastEnd = []; // last endYear in each row
+    const rowsLastEnd = [];
+    const rowAssignments = {};
     for (const os of oses) {
-      const endY = (os.ended ?? CURRENT_YEAR) + 1; // +1 buffer so adjacent don't overlap
+      const endY = (os.ended ?? CURRENT_YEAR) + 1;
       let placed = false;
       for (let i = 0; i < rowsLastEnd.length; i++) {
         if (rowsLastEnd[i] < os.born) {
-          os._row = i;
+          rowAssignments[os.id] = i;
           rowsLastEnd[i] = endY;
           placed = true;
           break;
         }
       }
       if (!placed) {
-        os._row = rowsLastEnd.length;
+        rowAssignments[os.id] = rowsLastEnd.length;
         rowsLastEnd.push(endY);
       }
     }
-    layouts[house] = { rows: Math.max(1, rowsLastEnd.length), oses };
+    layouts[house] = { rows: Math.max(1, rowsLastEnd.length), rowAssignments };
   }
   return layouts;
 }
 
-const layouts = packHouses();
-
-// Compute house Y offsets
-function computeHouseGeometry() {
+function computeHouseGeometry(layouts) {
   let y = MARGIN_TOP;
   const houseY = {};
   for (const h of HOUSE_ORDER) {
@@ -1260,19 +1759,31 @@ function computeHouseGeometry() {
   return { houseY, totalHeight: y + MARGIN_BOTTOM };
 }
 
-const { houseY, totalHeight } = computeHouseGeometry();
-
 function yearToX(year) {
   return MARGIN_LEFT + (year - YEAR_MIN) * PX_PER_YEAR;
 }
-function osBarRect(os) {
+
+// Get bar rectangle for an OS in a given layout. Returns null if the OS
+// isn't in the layout (e.g. movement OS in the layer-off layout).
+function osBarRect(os, layout) {
+  const row = layout.layouts[os.house].rowAssignments[os.id];
+  if (row === undefined) return null;
+  const houseInfo = layout.houseY[os.house];
   const x1 = yearToX(os.born);
   const x2 = yearToX((os.ended ?? CURRENT_YEAR));
-  const houseInfo = houseY[os.house];
-  const y = houseInfo.top + HOUSE_PAD_TOP + os._row * (BAR_HEIGHT + ROW_GAP);
+  const y = houseInfo.top + HOUSE_PAD_TOP + row * (BAR_HEIGHT + ROW_GAP);
   return { x: x1, y, w: Math.max(8, x2 - x1), h: BAR_HEIGHT, cx: (x1+x2)/2, cy: y + BAR_HEIGHT/2 };
 }
 
+// Two pre-computed layouts: OFF = original 110 entries; ON = all 161.
+const _layoutsOff = packHouses(false);
+const _layoutsOn  = packHouses(true);
+const LAYOUT_OFF = { layouts: _layoutsOff, ...computeHouseGeometry(_layoutsOff) };
+const LAYOUT_ON  = { layouts: _layoutsOn,  ...computeHouseGeometry(_layoutsOn) };
+
+// Backward-compat aliases (default to OFF — the initial render state).
+const houseY = LAYOUT_OFF.houseY;
+const totalHeight = LAYOUT_OFF.totalHeight;
 const totalWidth = yearToX(YEAR_MAX) + MARGIN_RIGHT;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1292,64 +1803,82 @@ function el(tag, attrs={}, parent=svg) {
   return e;
 }
 
-// — house bands —
-const bandsG = el('g', { class: 'bands' });
-HOUSE_ORDER.forEach((h, i) => {
-  const info = houseY[h];
-  el('rect', {
-    x: 0, y: info.top, width: totalWidth, height: info.height,
-    class: i % 2 === 0 ? 'house-band' : 'house-band-alt',
-    'data-house-band': h,
-  }, bandsG);
-  // house top rule
-  el('line', {
-    x1: 0, y1: info.top, x2: totalWidth, y2: info.top, class: 'house-rule'
-  }, bandsG);
-});
-// final bottom rule
-el('line', {
-  x1: 0, y1: totalHeight - MARGIN_BOTTOM, x2: totalWidth, y2: totalHeight - MARGIN_BOTTOM,
-  class: 'house-rule'
-}, bandsG);
+// ─── Re-runnable chrome rendering ──────────────────────────
+// Bands, labels, axis, decade rules, and lineage lines are re-rendered
+// from scratch whenever the active layout changes (e.g. layer toggle).
+// Bars themselves are rendered once at LAYOUT_OFF position and slide
+// to LAYOUT_ON via CSS transform on a body class — see bar loop below.
 
-// — house labels (sticky column, repositioned by scroll listener below) —
-const labelsG = el('g', { class: 'house-labels' });
-// opaque backdrop — keeps labels legible when scrolled over bars
-el('rect', {
+const bandsG    = el('g', { class: 'bands' });
+const labelsG   = el('g', { class: 'house-labels' });
+const axisTopG  = el('g', { class: 'axis-top' });
+const axisBotG  = el('g', { class: 'axis-bot' });
+const decadeG   = el('g', { class: 'decade-rules' });
+const lineagesG = el('g', { class: 'lineages' });
+
+// Sticky overlay backdrop + fade — built once, height updated on toggle.
+const stickyBg = el('rect', {
   x: 0, y: 0, width: MARGIN_LEFT, height: totalHeight,
   class: 'sticky-bg',
   'pointer-events': 'all',
 }, labelsG);
-// gradient fade on the right edge so the column doesn't have a hard seam
 const defs = el('defs', {}, labelsG);
 const grad = el('linearGradient',
   { id: 'sticky-fade-grad', x1: '0', x2: '1', y1: '0', y2: '0' }, defs);
 el('stop', { offset: '0%',   'stop-color': '#0c0a07', 'stop-opacity': '1' }, grad);
 el('stop', { offset: '100%', 'stop-color': '#0c0a07', 'stop-opacity': '0' }, grad);
-el('rect', {
+const stickyFade = el('rect', {
   x: MARGIN_LEFT, y: 0, width: 28, height: totalHeight,
   fill: 'url(#sticky-fade-grad)',
   class: 'sticky-fade',
 }, labelsG);
+// Sub-group for the per-house text labels — cleared on re-render.
+const houseTextG = el('g', { class: 'house-text' }, labelsG);
 
-HOUSE_ORDER.forEach(h => {
-  const info = houseY[h];
-  const HC = HOUSES[h];
-  const cy = info.top + info.height / 2;
-  el('text', {
-    x: 24, y: cy - 14, class: 'house-label-id', fill: HC.color
-  }, labelsG).textContent = HC.short.toUpperCase();
-  el('text', {
-    x: 24, y: cy + 5, class: 'house-label'
-  }, labelsG).textContent = HC.name;
-  el('text', {
-    x: 24, y: cy + 24, class: 'house-label-motto'
-  }, labelsG).textContent = HC.motto;
-});
+function clearChildren(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
 
-// — year axis (top + bottom) —
-function renderAxis(y, isTop) {
-  const g = el('g', { class: 'axis' });
+function renderBands(layout) {
+  clearChildren(bandsG);
+  HOUSE_ORDER.forEach((h, i) => {
+    const info = layout.houseY[h];
+    el('rect', {
+      x: 0, y: info.top, width: totalWidth, height: info.height,
+      class: i % 2 === 0 ? 'house-band' : 'house-band-alt',
+      'data-house-band': h,
+    }, bandsG);
+    el('line', {
+      x1: 0, y1: info.top, x2: totalWidth, y2: info.top, class: 'house-rule'
+    }, bandsG);
+  });
+  el('line', {
+    x1: 0, y1: layout.totalHeight - MARGIN_BOTTOM,
+    x2: totalWidth, y2: layout.totalHeight - MARGIN_BOTTOM,
+    class: 'house-rule'
+  }, bandsG);
+}
+
+function renderHouseLabels(layout) {
+  clearChildren(houseTextG);
+  HOUSE_ORDER.forEach(h => {
+    const info = layout.houseY[h];
+    const HC = HOUSES[h];
+    const cy = info.top + info.height / 2;
+    el('text', {
+      x: 24, y: cy - 14, class: 'house-label-id', fill: HC.color
+    }, houseTextG).textContent = HC.short.toUpperCase();
+    el('text', {
+      x: 24, y: cy + 5, class: 'house-label'
+    }, houseTextG).textContent = HC.name;
+    el('text', {
+      x: 24, y: cy + 24, class: 'house-label-motto'
+    }, houseTextG).textContent = HC.motto;
+  });
+}
+
+function renderAxis(g, y, isTop) {
+  clearChildren(g);
   el('line', {
     x1: MARGIN_LEFT, y1: y, x2: yearToX(YEAR_MAX), y2: y,
     class: 'axis-line'
@@ -1369,79 +1898,101 @@ function renderAxis(y, isTop) {
       }, g).textContent = yr;
     }
   }
-  return g;
-}
-renderAxis(MARGIN_TOP - 24, true);
-renderAxis(totalHeight - MARGIN_BOTTOM + 14, false);
-
-// — vertical decade rules (subtle) —
-const decadeG = el('g', { class: 'decade-rules' });
-for (let yr = 1970; yr <= 2030; yr += 10) {
-  const x = yearToX(yr);
-  el('line', {
-    x1: x, y1: MARGIN_TOP - 24, x2: x, y2: totalHeight - MARGIN_BOTTOM,
-    stroke: 'rgba(232,227,214,0.05)', 'stroke-width': 1
-  }, decadeG);
 }
 
-// — lineage lines (drawn before bars so bars sit on top) —
-const lineagesG = el('g', { class: 'lineages' });
-function lineageColor(childHouse) {
-  return HOUSES[childHouse].color;
-}
-function drawLineage(parent, child, rel) {
-  const pr = osBarRect(parent);
-  const cr = osBarRect(child);
-  const x1 = pr.x + pr.w;
-  const y1 = pr.y + pr.h / 2;
-  const x2 = cr.x;
-  const y2 = cr.y + cr.h / 2;
-  const dx = Math.max(20, (x2 - x1) * 0.45);
-  const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-  const line = el('path', {
-    d: path,
-    stroke: lineageColor(child.house),
-    class: 'lineage-line' + (rel === 'derived' ? '' : ' dashed'),
-    'data-parent': parent.id,
-    'data-child': child.id,
-    'data-rel': rel,
-  }, lineagesG);
-  return line;
-}
-
-const lineageLines = []; // {el, parentId, childId, rel}
-for (const os of OSES) {
-  for (const p of os.parents) {
-    const parent = byId.get(p.id);
-    if (!parent) continue;
-    const line = drawLineage(parent, os, p.rel);
-    lineageLines.push({ el: line, parentId: parent.id, childId: os.id, rel: p.rel });
+function renderDecadeRules(layout) {
+  clearChildren(decadeG);
+  for (let yr = 1970; yr <= 2030; yr += 10) {
+    const x = yearToX(yr);
+    el('line', {
+      x1: x, y1: MARGIN_TOP - 24, x2: x, y2: layout.totalHeight - MARGIN_BOTTOM,
+      stroke: 'rgba(232,227,214,0.05)', 'stroke-width': 1
+    }, decadeG);
   }
 }
 
-// — bars —
+function lineageColor(childHouse) { return HOUSES[childHouse].color; }
+
+// Lineage paths are re-rendered on every layout change. lineageLines is
+// the canonical array used by interaction code (highlight, bloodline);
+// we keep its shape stable across re-renders.
+const lineageLines = [];
+
+function renderLineages(layout) {
+  clearChildren(lineagesG);
+  lineageLines.length = 0;
+  for (const os of OSES) {
+    for (const p of os.parents) {
+      const parent = byId.get(p.id);
+      if (!parent) continue;
+      const pr = osBarRect(parent, layout);
+      const cr = osBarRect(os, layout);
+      if (!pr || !cr) continue; // either endpoint absent from this layout
+      const x1 = pr.x + pr.w, y1 = pr.y + pr.h / 2;
+      const x2 = cr.x,        y2 = cr.y + cr.h / 2;
+      const dx = Math.max(20, (x2 - x1) * 0.45);
+      const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+      const movementInvolved = os.movement === true || parent.movement === true;
+      const line = el('path', {
+        d: path,
+        stroke: lineageColor(os.house),
+        class: 'lineage-line'
+          + (p.rel === 'derived' ? '' : ' dashed')
+          + (movementInvolved ? ' lineage-movement' : ''),
+        'data-parent': parent.id,
+        'data-child': os.id,
+        'data-rel': p.rel,
+      }, lineagesG);
+      lineageLines.push({ el: line, parentId: parent.id, childId: os.id, rel: p.rel });
+    }
+  }
+}
+
+// Initial render at LAYOUT_OFF — the current 110-bar chart.
+renderBands(LAYOUT_OFF);
+renderHouseLabels(LAYOUT_OFF);
+renderAxis(axisTopG, MARGIN_TOP - 24, true);
+renderAxis(axisBotG, LAYOUT_OFF.totalHeight - MARGIN_BOTTOM + 14, false);
+renderDecadeRules(LAYOUT_OFF);
+renderLineages(LAYOUT_OFF);
+
+// — bars (rendered once; non-movement bars translate via CSS on toggle) —
 const barsG = el('g', { class: 'bars' });
 const barGroupById = new Map();
 for (const os of OSES) {
-  const r = osBarRect(os);
+  const isMovement = os.movement === true;
+  // Non-movement bars sit at their LAYOUT_OFF position; movement bars only
+  // exist in LAYOUT_ON and are rendered there directly (hidden until toggle).
+  const rOff = osBarRect(os, LAYOUT_OFF);
+  const rOn  = osBarRect(os, LAYOUT_ON);
+  const r = isMovement ? rOn : rOff;
   const house = HOUSES[os.house];
 
-  const g = el('g', { class: 'os-bar-group', 'data-id': os.id }, barsG);
+  const classes = ['os-bar-group'];
+  if (isMovement) classes.push('movement');
+  if (os.clade) classes.push('clade-' + os.clade);
 
-  // background (panel-tinted)
+  const g = el('g', {
+    class: classes.join(' '),
+    'data-id': os.id,
+    'data-house': os.house,
+  }, barsG);
+  // delta-y drives the CSS transform when body.layer-on is applied
+  if (!isMovement && rOn) {
+    const deltaY = rOn.y - rOff.y;
+    if (deltaY !== 0) g.style.setProperty('--delta-y', deltaY + 'px');
+  }
+
   el('rect', {
     x: r.x, y: r.y, width: r.w, height: r.h,
     class: 'os-bar-bg'
   }, g);
-
-  // tinted fill
   el('rect', {
     x: r.x, y: r.y, width: r.w, height: r.h,
     class: 'os-bar',
     fill: house.color, stroke: house.color
   }, g);
 
-  // arrow cap if still alive
   if (os.ended === null) {
     const ax = r.x + r.w;
     const ay = r.y + r.h / 2;
@@ -1452,9 +2003,7 @@ for (const os of OSES) {
     }, g);
   }
 
-  // label inside (truncated if bar is wide enough) else at end
   const label = os.name;
-  // text width heuristic: 6.2px per char in JetBrains Mono at 10.5px
   const approxTextW = label.length * 6.4 + 12;
   if (r.w >= approxTextW + 6) {
     el('text', {
@@ -1462,15 +2011,7 @@ for (const os of OSES) {
       class: 'os-label',
       fill: 'var(--text)'
     }, g).textContent = label;
-  } else if (r.w >= 30) {
-    // short label inside, full label at end
-    el('text', {
-      x: r.x + r.w + 8, y: r.y + r.h / 2,
-      class: 'os-label',
-      fill: 'var(--text-2)'
-    }, g).textContent = label;
   } else {
-    // very short bar — full label to the right
     el('text', {
       x: r.x + r.w + 8, y: r.y + r.h / 2,
       class: 'os-label',
@@ -1601,12 +2142,14 @@ function onBarClick(id) {
   selectedId = id;
   applyHighlight(bloodline(id));
   openDetail(id);
-  // scroll to bring bar into view
+  // scroll to bring bar into view (x is layout-independent — depends only on year)
   const os = byId.get(id);
-  const r = osBarRect(os);
-  const wrap = document.getElementById('chartWrap');
-  const desiredScroll = r.x - wrap.clientWidth / 2 + r.w / 2;
-  wrap.scrollTo({ left: Math.max(0, desiredScroll), behavior: 'smooth' });
+  const r = osBarRect(os, currentLayout);
+  if (r) {
+    const wrap = document.getElementById('chartWrap');
+    const desiredScroll = r.x - wrap.clientWidth / 2 + r.w / 2;
+    wrap.scrollTo({ left: Math.max(0, desiredScroll), behavior: 'smooth' });
+  }
 }
 
 document.getElementById('chartWrap').addEventListener('click', (ev) => {
@@ -1653,17 +2196,30 @@ function openDetail(id) {
   const span = ended - os.born;
   const status = os.ended === null ? 'still alive' : `ended ${os.ended}`;
 
+  const clade = os.movement && os.clade ? CLADES[os.clade] : null;
+  const movementBadge = clade ? `
+    <div class="detail-movement-badge">
+      <span class="clade-dot" style="background:${clade.accent};"></span>
+      <span class="free-peoples">The Free Peoples</span>
+      <span style="color:var(--faint);">·</span>
+      ${clade.short}
+    </div>` : '';
+  const movementNote = (clade && os.movementNote) ? `
+    <p class="detail-movement-note">${os.movementNote}</p>` : '';
+
   detailContent.innerHTML = `
     <div class="detail-house-id" style="--dot:${house.color};">
       <span style="background:${house.color}; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
       ${house.name}
     </div>
+    ${movementBadge}
     <h2 class="detail-name">${os.name}</h2>
     <div class="detail-company">${os.company}</div>
     <div class="detail-dates">
       <span class="big">${os.born}</span><span class="span">—</span><span class="big">${os.ended ?? '·····'}</span>
       <div class="detail-status ${os.ended === null ? 'active' : ''}">${status} · ${span} years</div>
     </div>
+    ${movementNote}
     <p class="detail-note">${os.note}</p>
 
     <div class="detail-section">
@@ -1714,6 +2270,12 @@ function applyFilters() {
   for (const [id, g] of barGroupById) {
     const os = byId.get(id);
     let visible = true;
+    // Movement bars: hidden via CSS when layer off (don't override here).
+    if (os.movement && !showMovements) {
+      g.style.opacity = '';
+      g.style.pointerEvents = '';
+      continue;
+    }
     if (filterHouse !== 'all' && os.house !== filterHouse) visible = false;
     if (searchTerm && !os.name.toLowerCase().includes(searchTerm) && !os.company.toLowerCase().includes(searchTerm)) {
       visible = false;
@@ -1745,6 +2307,49 @@ document.getElementById('searchInput').addEventListener('input', (ev) => {
   applyFilters();
 });
 
+// ─── Layer toggle: The Free Peoples ───
+let showMovements = false;
+let currentLayout = LAYOUT_OFF;
+
+function setLayer(on) {
+  if (on === showMovements) return;
+  showMovements = on;
+  currentLayout = on ? LAYOUT_ON : LAYOUT_OFF;
+
+  // Grow SVG canvas BEFORE the CSS transform fires so translated bars are
+  // not clipped by the smaller viewBox during the slide.
+  svg.setAttribute('height', currentLayout.totalHeight);
+  svg.setAttribute('viewBox', `0 0 ${totalWidth} ${currentLayout.totalHeight}`);
+  // chart-wrap height transitions via CSS (rule above).
+  chartWrap.style.height = currentLayout.totalHeight + 'px';
+
+  // Body class triggers the per-bar CSS transform and the movement fade.
+  document.body.classList.toggle('layer-on', on);
+
+  // Re-render the chrome that depends on house geometry.
+  renderBands(currentLayout);
+  renderHouseLabels(currentLayout);
+  renderAxis(axisBotG, currentLayout.totalHeight - MARGIN_BOTTOM + 14, false);
+  renderDecadeRules(currentLayout);
+  renderLineages(currentLayout);
+
+  // Update sticky overlay heights & put labels back on top of bars.
+  stickyBg.setAttribute('height', currentLayout.totalHeight);
+  stickyFade.setAttribute('height', currentLayout.totalHeight);
+  svg.appendChild(labelsG);
+  updateStickyOverlay();
+
+  // Lineage paths were replaced; re-apply current highlight (if any).
+  if (selectedId) applyHighlight(bloodline(selectedId));
+  else applyFilters();
+
+  document.getElementById('layerToggle').setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
+document.getElementById('layerToggle').addEventListener('click', () => {
+  setLayer(!showMovements);
+});
+
 // ═══════════════════════════════════════════════════════════════════
 //  LEGEND
 // ═══════════════════════════════════════════════════════════════════
@@ -1752,7 +2357,8 @@ document.getElementById('searchInput').addEventListener('input', (ev) => {
 const legendGrid = document.getElementById('legendGrid');
 HOUSE_ORDER.forEach(h => {
   const HC = HOUSES[h];
-  const count = OSES.filter(o => o.house === h).length;
+  // Count only non-movement entries so house counts match the default chart.
+  const count = OSES.filter(o => o.house === h && !o.movement).length;
   const row = document.createElement('div');
   row.className = 'legend-row';
   row.innerHTML = `
@@ -1763,6 +2369,22 @@ HOUSE_ORDER.forEach(h => {
     </div>
   `;
   legendGrid.appendChild(row);
+});
+
+const cladeGrid = document.getElementById('cladeGrid');
+CLADE_ORDER.forEach(k => {
+  const CL = CLADES[k];
+  const count = OSES.filter(o => o.movement && o.clade === k).length;
+  const row = document.createElement('div');
+  row.className = 'clade-row';
+  row.innerHTML = `
+    <div class="clade-swatch" style="background:${CL.accent};"></div>
+    <div>
+      <p class="clade-name">${CL.name} <span class="count">· ${count}</span></p>
+      <p class="clade-motto">${CL.motto}</p>
+    </div>
+  `;
+  cladeGrid.appendChild(row);
 });
 
 // ═══════════════════════════════════════════════════════════════════
