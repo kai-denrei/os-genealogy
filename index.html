@@ -162,6 +162,61 @@
   }
 
   /* ╭─────────────────────────────────────────────────────────╮
+     │ TAB STRIP — Genealogy / Bare Metal                        │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 48px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 35;
+    backdrop-filter: blur(8px);
+  }
+  .tab {
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    padding: 14px 22px 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    transition: color 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+    font-family: var(--serif-display);
+    text-align: left;
+    border-radius: 0;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--text-2); background: rgba(232,227,214,0.02); }
+  .tab .tab-title {
+    font-style: italic;
+    font-weight: 500;
+    font-size: 21px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .tab .tab-sub {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .tab.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  .tab.active .tab-title { color: var(--text); }
+  .tab[data-chart="baremetal"].active { border-bottom-color: #a16207; }
+  .tab[data-chart="baremetal"].active .tab-title { color: #d4a64a; }
+
+  /* ╭─────────────────────────────────────────────────────────╮
      │ CONTROL BAR                                               │
      ╰─────────────────────────────────────────────────────────╯ */
   .controls {
@@ -173,7 +228,7 @@
     gap: 18px;
     align-items: center;
     position: sticky;
-    top: 0;
+    top: 49px; /* sits below tab strip */
     z-index: 30;
     backdrop-filter: blur(8px);
   }
@@ -200,16 +255,23 @@
   }
   .chip:hover { background: var(--panel); color: var(--text); }
   .chip.active { color: var(--bg); font-weight: 600; }
-  .chip[data-house="mainframe"].active { background: var(--c-mainframe); border-color: var(--c-mainframe); }
-  .chip[data-house="unix"].active      { background: var(--c-unix);      border-color: var(--c-unix); }
-  .chip[data-house="bsd"].active       { background: var(--c-bsd);       border-color: var(--c-bsd); }
-  .chip[data-house="linux"].active     { background: var(--c-linux);     border-color: var(--c-linux); }
-  .chip[data-house="apple"].active     { background: var(--c-apple);     border-color: var(--c-apple); }
-  .chip[data-house="dos"].active       { background: var(--c-dos);       border-color: var(--c-dos); }
-  .chip[data-house="nt"].active        { background: var(--c-nt);        border-color: var(--c-nt); }
-  .chip[data-house="altpc"].active     { background: var(--c-altpc);     border-color: var(--c-altpc); }
-  .chip[data-house="mobile"].active    { background: var(--c-mobile);    border-color: var(--c-mobile); }
+  /* Active chip colour resolved from inline --chip-color set in JS, with
+     a per-tab default fallback so the genealogy palette is preserved. */
+  .chip.active {
+    background: var(--chip-color, var(--accent));
+    border-color: var(--chip-color, var(--accent));
+  }
+  .chip[data-house="mainframe"].active { --chip-color: var(--c-mainframe); }
+  .chip[data-house="unix"].active      { --chip-color: var(--c-unix); }
+  .chip[data-house="bsd"].active       { --chip-color: var(--c-bsd); }
+  .chip[data-house="linux"].active     { --chip-color: var(--c-linux); }
+  .chip[data-house="apple"].active     { --chip-color: var(--c-apple); }
+  .chip[data-house="dos"].active       { --chip-color: var(--c-dos); }
+  .chip[data-house="nt"].active        { --chip-color: var(--c-nt); }
+  .chip[data-house="altpc"].active     { --chip-color: var(--c-altpc); }
+  .chip[data-house="mobile"].active    { --chip-color: var(--c-mobile); }
   .chip-all.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  body.chart-baremetal .chip-all.active { background: #a16207; border-color: #a16207; }
 
   /* ╭─────────────────────────────────────────────────────────╮
      │ LAYER TOGGLE — The Free Peoples                           │
@@ -418,6 +480,63 @@
 
   /* Chart-wrap height transitions to match SVG growth on toggle */
   .chart-wrap { transition: height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+  /* ─── Bare Metal chart styling ─── */
+  body.chart-baremetal {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(161, 98, 7, 0.06), transparent 60%),
+      radial-gradient(circle at 80% 90%, rgba(14, 116, 144, 0.05), transparent 60%);
+  }
+  /* Lineage lines on bare metal read load-bearing — slightly stronger. */
+  body.chart-baremetal .lineage-line { opacity: 0.42; }
+  body.chart-baremetal .lineage-line.dashed { opacity: 0.30; }
+
+  /* Foundational technologies (kind:'tech') — half-height bars + hatched fill */
+  .os-bar-group.tech .os-bar-bg { fill: transparent; }
+  .os-bar-group.tech .os-bar {
+    fill: url(#tech-hatch);
+    fill-opacity: 0.42;
+    stroke-width: 1;
+    stroke-dasharray: none;
+  }
+  .os-bar-group.tech:hover .os-bar { fill-opacity: 0.62; stroke-width: 1.4; }
+
+  /* Ghost ancestor bars — cross-chart references shown muted */
+  .os-bar-group.ghost { opacity: 0; pointer-events: none; }
+  .os-bar-group.ghost .os-bar-bg { fill: rgba(232,227,214,0.02); }
+  .os-bar-group.ghost .os-bar {
+    fill-opacity: 0.08;
+    stroke-dasharray: 3 3;
+    stroke-width: 1.1;
+    stroke: var(--muted);
+  }
+  .os-bar-group.ghost:hover .os-bar { fill-opacity: 0.20; stroke: var(--text-2); }
+  .os-bar-group.ghost .os-label,
+  .os-bar-group.ghost .ghost-label { letter-spacing: 0.06em; font-style: italic; }
+  body.ancestors-on .os-bar-group.ghost { opacity: 1; pointer-events: auto; }
+
+  /* Bare-metal-specific bar tints to push the palette darker. */
+  body.chart-baremetal .os-bar { fill-opacity: 0.26; stroke-width: 1.1; }
+  body.chart-baremetal .os-bar-group:hover .os-bar { fill-opacity: 0.46; stroke-width: 1.6; }
+  body.chart-baremetal .os-bar-group.selected .os-bar { fill-opacity: 0.62; }
+  body.chart-baremetal .os-bar-bg { fill: #100d09; }
+
+  /* Cross-fade transition on chart switch. The bars/lineages/labels are
+     wholly replaced; this just softens the swap. */
+  svg#chart { transition: opacity 0.25s ease; }
+  body.chart-swapping svg#chart { opacity: 0; }
+
+  /* Detail panel — cross-chart jump arrow */
+  .detail-list .cross-arrow {
+    color: var(--accent-2);
+    margin-left: 4px;
+    font-size: 9.5px;
+  }
+  .detail-baremetal-badge {
+    border-left-color: #d4a64a !important;
+    background: rgba(212, 166, 74, 0.04);
+  }
+  .detail-baremetal-badge .free-peoples { color: #d4a64a !important; }
 
   .os-label {
     font-family: var(--mono);
@@ -1037,29 +1156,29 @@
     </p>
   </div>
   <div class="colophon">
-    <ul class="colophon-stats">
+    <ul class="colophon-stats" id="colophonStats">
       <li><strong>110</strong><span>entries</span></li>
       <li><strong>9</strong><span>houses</span></li>
       <li><strong>57</strong><span>years of feuding</span></li>
     </ul>
-    <p class="colophon-note">Curated, opinionated, <br>non-exhaustive by design.</p>
+    <p class="colophon-note" id="colophonNote">Curated, opinionated, <br>non-exhaustive by design.</p>
   </div>
 </header>
 
+<nav class="tabs" id="tabStrip" role="tablist" aria-label="Choose chart">
+  <button class="tab active" type="button" role="tab" aria-selected="true"  data-chart="genealogy">
+    <span class="tab-title">Genealogy</span>
+    <span class="tab-sub">the user-facing operating systems</span>
+  </button>
+  <button class="tab"        type="button" role="tab" aria-selected="false" data-chart="baremetal">
+    <span class="tab-title">Bare Metal</span>
+    <span class="tab-sub">land of the machines</span>
+  </button>
+</nav>
+
 <nav class="controls">
   <span class="ctrl-label">Houses</span>
-  <div class="houses" id="houseChips">
-    <button class="chip chip-all active" data-house="all">All</button>
-    <button class="chip" data-house="mainframe">Mainframe</button>
-    <button class="chip" data-house="unix">Unix</button>
-    <button class="chip" data-house="bsd">BSD</button>
-    <button class="chip" data-house="linux">Linux</button>
-    <button class="chip" data-house="apple">Cupertino</button>
-    <button class="chip" data-house="dos">DOS · Win9x</button>
-    <button class="chip" data-house="nt">Redmond</button>
-    <button class="chip" data-house="altpc">Exiles</button>
-    <button class="chip" data-house="mobile">Pocket</button>
-  </div>
+  <div class="houses" id="houseChips"></div>
   <button class="layer-toggle" id="layerToggle" type="button" aria-pressed="false"
           aria-label="Toggle The Free Peoples — the open source movements layer">
     <span class="layer-mark" aria-hidden="true"></span>
@@ -1125,7 +1244,7 @@
 //  DATA
 // ═══════════════════════════════════════════════════════════════════
 
-const HOUSES = {
+const HOUSES_GENEALOGY = {
   mainframe: { name: 'House Mainframe',  short: 'Mainframe',  color: '#d4a64a',
     motto: 'Old kingdoms, still humming in the basement.' },
   unix:      { name: 'House Unix',       short: 'Unix',       color: '#5eead4',
@@ -1145,6 +1264,26 @@ const HOUSES = {
   mobile:    { name: 'House Pocket',     short: 'Mobile · Embedded', color: '#f0abfc',
     motto: 'Crowns small enough to fit in a pocket.' },
 };
+
+// ─── BARE METAL HOUSES — Land of the Machines ───────────────
+// Darker, more saturated palette to read "a layer deeper" than the
+// user-facing chart. Bronze (sovereigns of the metal), steel-cyan
+// (hosts of the containers), violet (where application is OS), and
+// a muted ancestors lane for cross-chart references.
+const HOUSES_BAREMETAL = {
+  ancestors:  { name: 'Shared Ancestors',     short: 'Ancestors',  color: '#8a8373',
+    motto: 'These live in the Genealogy chart; shown here for lineage.' },
+  hypervisor: { name: 'The Hypervisor House', short: 'Hypervisor', color: '#a16207',
+    motto: 'Sovereigns of the metal · grantors of audience.' },
+  substrate:  { name: 'The Substrate House',  short: 'Substrate',  color: '#0e7490',
+    motto: 'Hosts of the containers · no shell, no purpose but to host.' },
+  unicorn:    { name: 'The Unicorns',         short: 'Unicorns',   color: '#7c3aed',
+    motto: 'Where the application is the operating system.' },
+};
+
+// Aliased so legacy references inside render functions keep working;
+// at runtime everything that takes a chart context is parameterised.
+const HOUSES = HOUSES_GENEALOGY;
 
 // ─── CLADES — The Free Peoples ──────────────────────────────
 // A toggleable confederation orthogonal to the houses: projects that
@@ -1173,6 +1312,61 @@ const CLADES = {
     motto: 'For the long descent, and after.' },
 };
 const CLADE_ORDER = ['fsf','bell-labs','privacy','anti-systemd','mobile-rebel','from-scratch','microkernel','immutable','market-rebel','eschaton'];
+
+// ─── CLADES — Bare Metal sub-groupings ──────────────────────
+// Tuned to harmonise with the bronze/steel-cyan/violet house palette:
+// warm-bronze accents within hypervisor, cool-cyan inside substrate,
+// and a separate hyperscaler/silicon family rendered in muted red.
+const CLADES_BAREMETAL = {
+  // Hypervisor House clades
+  'cambridge-line':   { name: 'The Cambridge Line',     short: 'Cambridge',   accent: '#fbbf24',
+    motto: 'IBM Cambridge MA → Cambridge UK → KVM. The open lineage.' },
+  'commercial-stack': { name: 'The Commercial Stack',   short: 'Commercial',  accent: '#cbd5e1',
+    motto: 'VMware, Microsoft, the licence-and-EULA wing.' },
+  'silicon-bound':    { name: 'The Silicon-Bound',      short: 'Silicon',     accent: '#fb7185',
+    motto: 'Hyperscalers and hardware-coupled hypervisors.' },
+  // Substrate House clades
+  'coreos-line':      { name: 'The CoreOS Line',        short: 'CoreOS',      accent: '#5eead4',
+    motto: 'Immutable roots, container-only servers.' },
+  'vendor-substrate': { name: 'The Vendor Substrates',  short: 'Vendor',      accent: '#67e8f9',
+    motto: 'Container hosts shipped by the cloud they ride on.' },
+  'kubernetes-only':  { name: 'The Kubernetes-Only',    short: 'K8s',         accent: '#86efac',
+    motto: 'Linux without the Linux operational pattern.' },
+};
+const CLADE_ORDER_BAREMETAL = ['cambridge-line','commercial-stack','silicon-bound','coreos-line','vendor-substrate','kubernetes-only'];
+
+// Merged lookup for the detail panel (works regardless of which chart
+// an entry belongs to — clade IDs across charts are unique).
+const CLADES_ALL = { ...CLADES, ...CLADES_BAREMETAL };
+
+// Chart registry — one entry per chart. Drives the tab system.
+const CHARTS = {
+  genealogy: {
+    id: 'genealogy',
+    label: 'Genealogy',
+    sub: 'the user-facing operating systems',
+    title: 'Houses & Bloodlines',
+    subtitle: 'An operating-system genealogy, 1969–2026.',
+    houses: HOUSES_GENEALOGY,
+    houseOrder: ['mainframe','unix','bsd','apple','dos','nt','altpc','linux','mobile'],
+    clades: CLADES,
+    cladeOrder: CLADE_ORDER,
+  },
+  baremetal: {
+    id: 'baremetal',
+    label: 'Bare Metal',
+    sub: 'land of the machines',
+    title: 'The Bare Metal Houses',
+    subtitle: 'Land of the Machines · 1967–2026.',
+    houses: HOUSES_BAREMETAL,
+    houseOrder: ['ancestors','hypervisor','substrate','unicorn'],
+    clades: CLADES_BAREMETAL,
+    cladeOrder: CLADE_ORDER_BAREMETAL,
+  },
+};
+
+// Resolve an entry's chart (absence defaults to genealogy).
+function chartOf(os) { return os.chart || 'genealogy'; }
 
 const OSES = [
   // ─── MAINFRAME ───────────────────────────────────────────────
@@ -1669,6 +1863,212 @@ const OSES = [
     parents:[{id:'collapse-os',rel:'derived'}], company:'Virgil Dupras',
     movement:true, clade:'eschaton',
     note:'Collapse OS’s successor — same author, broader target (32-bit), still Forth-rooted. Intended as the “dusk” OS for the long descent, not the post-apocalypse.' },
+
+  // ════════════════════════════════════════════════════════════════
+  //  THE BARE METAL HOUSES — Land of the Machines
+  //  A sister chart. Hypervisors, container substrates, unikernels.
+  //  Entries carry chart:'baremetal'. Absence of chart defaults to
+  //  'genealogy' — every entry above belongs to the user-facing chart.
+  // ════════════════════════════════════════════════════════════════
+
+  // ─── Foundational technologies (kind:'tech', half-height bars) ───
+  { id:'cp40', name:'CP-40', house:'hypervisor', born:1967, ended:1972,
+    parents:[], company:'IBM Cambridge Scientific Center',
+    chart:'baremetal', clade:'cambridge-line', kind:'tech',
+    note:'The first virtual machine system. IBM Cambridge MA, on a modified S/360 Model 40. Direct ancestor of CP-67 and VM/370.' },
+  { id:'cp67', name:'CP-67 / CMS', house:'hypervisor', born:1968, ended:1979,
+    parents:[{id:'cp40',rel:'derived'}], company:'IBM Cambridge Scientific Center',
+    chart:'baremetal', clade:'cambridge-line', kind:'tech',
+    note:'Second-generation virtualization on the S/360 Model 67. Each user got a complete virtual S/360. Productised as VM/370 in 1972.' },
+  { id:'chroot', name:'chroot', house:'substrate', born:1979, ended:null,
+    parents:[{id:'unixv7',rel:'derived'}], company:'Bell Labs',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'A Unix V7 syscall. The first filesystem-isolation primitive. Direct conceptual ancestor of every container — though it would be twenty years before anyone built containers around it.' },
+  { id:'jails', name:'FreeBSD jails', house:'substrate', born:2000, ended:null,
+    parents:[{id:'freebsd',rel:'derived'},{id:'chroot',rel:'inspired'}], company:'FreeBSD · Poul-Henning Kamp',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'First production-grade OS-level virtualization. PHK’s design. Influenced everything downstream.' },
+  { id:'linux-vserver', name:'Linux-VServer', house:'substrate', born:2001, ended:2018,
+    parents:[{id:'linux',rel:'derived'},{id:'jails',rel:'inspired'}], company:'community',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'First serious attempt at container-like isolation on Linux. Kernel patches; never mainlined. Mostly displaced by OpenVZ and then LXC.' },
+  { id:'zones', name:'Solaris Zones', house:'substrate', born:2004, ended:null,
+    parents:[{id:'solaris',rel:'derived'},{id:'jails',rel:'inspired'}], company:'Sun Microsystems',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'Sun’s commercial OS-level virtualization. Shipped in Solaris 10. Bryan Cantrill’s design — sophisticated, observable, the standard reference for years.' },
+  { id:'openvz', name:'OpenVZ', house:'substrate', born:2005, ended:null,
+    parents:[{id:'linux',rel:'derived'},{id:'linux-vserver',rel:'inspired'}], company:'SWsoft → Parallels → Virtuozzo',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'Production Linux containers before LXC existed. Patched kernel required. Still used in low-cost VPS hosting.' },
+  { id:'cgroups', name:'cgroups', house:'substrate', born:2008, ended:null,
+    parents:[{id:'linux',rel:'derived'}], company:'Google · Paul Menage, Rohit Seth',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'Linux kernel resource accounting and limiting. Merged in 2.6.24. Originated at Google for their internal Borg system. Without cgroups, no Docker.' },
+  { id:'lxc', name:'LXC', house:'substrate', born:2008, ended:null,
+    parents:[{id:'cgroups',rel:'derived'},{id:'openvz',rel:'inspired'}], company:'IBM · later LinuxContainers.org',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'The first containers built on mainline kernel primitives (cgroups + namespaces). Daniel Lezcano and Serge Hallyn at IBM. The substrate Docker initially used.' },
+  { id:'docker', name:'Docker', house:'substrate', born:2013, ended:null,
+    parents:[{id:'lxc',rel:'derived'}], company:'dotCloud → Docker Inc.',
+    chart:'baremetal', clade:'coreos-line', kind:'tech',
+    note:'Not an OS. The image format, the tooling, the cultural moment that made containers ubiquitous. Initially shipped on LXC, later moved to its own libcontainer (now runc/containerd).' },
+
+  // ─── The Hypervisor House · Cambridge Line ───────────────────
+  { id:'xen', name:'Xen', house:'hypervisor', born:2003, ended:null,
+    parents:[{id:'vm370',rel:'inspired'},{id:'linux',rel:'derived'}],
+    company:'University of Cambridge · Ian Pratt et al. → XenSource → Citrix → Linux Foundation',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Paravirtualization on x86. The SOSP 2003 paper "Xen and the Art of Virtualization" is the founding document. Originally required guest kernel modifications; later supported HVM. Now under the Linux Foundation.' },
+  { id:'kvm', name:'KVM', house:'hypervisor', born:2007, ended:null,
+    parents:[{id:'linux',rel:'derived'},{id:'xen',rel:'inspired'}],
+    company:'Qumranet · Avi Kivity → Red Hat (acquired 2008)',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Kernel-based Virtual Machine. Avi Kivity’s insight: with Intel VT-x and AMD-V, Linux itself can be a hypervisor — no separate kernel needed. Merged into Linux 2.6.20 (Feb 2007). Substrate of almost every modern Linux-based hypervisor.' },
+  { id:'xenserver', name:'XenServer · Citrix Hypervisor', house:'hypervisor', born:2007, ended:null,
+    parents:[{id:'xen',rel:'derived'}], company:'XenSource → Citrix (acquired 2007)',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Commercial product wrapping Xen with a management plane. Branding flip-flopped between XenServer and Citrix Hypervisor. Open-sourced 2013.' },
+  { id:'xcp-ng', name:'XCP-ng', house:'hypervisor', born:2018, ended:null,
+    parents:[{id:'xenserver',rel:'forked'}], company:'Vates · France',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Community fork of XenServer/Citrix Hypervisor after Citrix moved features behind paywalls. Vates maintains it from France. Free, no feature gates.' },
+  { id:'proxmox', name:'Proxmox VE', house:'hypervisor', born:2008, ended:null,
+    parents:[{id:'debian',rel:'derived'},{id:'kvm',rel:'derived'},{id:'lxc',rel:'derived'}],
+    company:'Proxmox Server Solutions · Vienna',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Debian + KVM + LXC + Perl-and-JavaScript web UI. The most consequential open-source hypervisor for small-to-mid datacenters and homelabs. Wraps two virtualization stacks at once.' },
+  { id:'rhev', name:'Red Hat Virtualization · RHEV', house:'hypervisor', born:2010, ended:2024,
+    parents:[{id:'kvm',rel:'derived'},{id:'rhel',rel:'derived'}], company:'Red Hat',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Red Hat’s commercial KVM management platform. Discontinued — Red Hat consolidated to OpenShift Virtualization (Kubernetes-managed VMs). End of an era.' },
+  { id:'ovirt', name:'oVirt', house:'hypervisor', born:2011, ended:2024,
+    parents:[{id:'kvm',rel:'derived'},{id:'fedora',rel:'derived'}], company:'Red Hat (open source upstream)',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Open-source upstream of RHEV. Reached end-of-life alongside RHEV. Some community continuation efforts.' },
+  { id:'harvester', name:'Harvester', house:'hypervisor', born:2021, ended:null,
+    parents:[{id:'suse',rel:'derived'},{id:'kvm',rel:'derived'}], company:'SUSE · Rancher',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Hyperconverged infrastructure built on Kubernetes managing KubeVirt managing KVM. The most architecturally ambitious recent hypervisor — Kubernetes all the way down.' },
+  { id:'bhyve', name:'bhyve', house:'hypervisor', born:2011, ended:null,
+    parents:[{id:'freebsd',rel:'derived'}], company:'NetApp → FreeBSD',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'FreeBSD’s modern Type 2 hypervisor (counts as Type 1 in some configurations). Originally Peter Grehan at NetApp. Now substrate of FreeNAS/TrueNAS VM features and several appliances.' },
+  { id:'smartos', name:'SmartOS', house:'hypervisor', born:2011, ended:null,
+    parents:[{id:'solaris',rel:'derived'},{id:'kvm',rel:'derived'}], company:'Joyent · Bryan Cantrill et al. → Samsung',
+    chart:'baremetal', clade:'cambridge-line',
+    note:'Illumos (the OpenSolaris fork) with KVM ported in by Cantrill’s team, plus Zones, ZFS, DTrace. Lives in memory, runs from USB, persists nothing locally. The most architecturally idiosyncratic hypervisor on the chart.' },
+
+  // ─── The Hypervisor House · Commercial Stack ─────────────────
+  { id:'disco', name:'Disco', house:'hypervisor', born:1997, ended:1999,
+    parents:[{id:'vm370',rel:'inspired'}], company:'Stanford · Bugnion, Devine, Govil, Rosenblum',
+    chart:'baremetal', clade:'commercial-stack', kind:'tech',
+    note:'Stanford research project that revived virtualization for commodity x86. The paper that founded VMware. Mendel Rosenblum and Edouard Bugnion left Stanford to co-found VMware in 1998.' },
+  { id:'vmware-esx', name:'VMware ESX', house:'hypervisor', born:2001, ended:2010,
+    parents:[{id:'disco',rel:'derived'}], company:'VMware',
+    chart:'baremetal', clade:'commercial-stack',
+    note:'First commercial bare-metal hypervisor for x86. Console OS was a stripped Linux. Discontinued in favor of ESXi (smaller, no console OS).' },
+  { id:'vmware-esxi', name:'VMware ESXi', house:'hypervisor', born:2007, ended:null,
+    parents:[{id:'vmware-esx',rel:'derived'}], company:'VMware · → Broadcom (acquired 2023)',
+    chart:'baremetal', clade:'commercial-stack',
+    note:'ESX without the Linux console — custom microkernel-style VMkernel. The dominant enterprise hypervisor for 15+ years. Broadcom’s 2023 acquisition and licensing changes created the largest exodus in datacenter history.' },
+  { id:'hyperv', name:'Hyper-V', house:'hypervisor', born:2008, ended:null,
+    parents:[{id:'vms',rel:'inspired'}], company:'Microsoft',
+    chart:'baremetal', clade:'commercial-stack',
+    note:'Microsoft’s Type 1 hypervisor, shipped with Windows Server 2008. Architecturally similar to Xen (microkernel + parent partition). Also ships as the standalone Hyper-V Server.' },
+
+  // ─── The Hypervisor House · Silicon-Bound ────────────────────
+  { id:'nutanix-ahv', name:'Nutanix AHV', house:'hypervisor', born:2015, ended:null,
+    parents:[{id:'kvm',rel:'derived'},{id:'centos',rel:'derived'}], company:'Nutanix',
+    chart:'baremetal', clade:'silicon-bound',
+    note:'KVM-based hypervisor packaged with Nutanix’s hyperconverged platform. Sold as appliance, not standalone. The most successful KVM commercialization aimed at displacing VMware.' },
+  { id:'nitro', name:'AWS Nitro', house:'hypervisor', born:2017, ended:null,
+    parents:[{id:'kvm',rel:'derived'}], company:'Amazon · Annapurna Labs',
+    chart:'baremetal', clade:'silicon-bound',
+    movementNote:'First deployed with the C5 instance family in late 2017. Built on KVM but with most of the hypervisor stack offloaded to custom Annapurna-designed silicon. AWS migrated all instances off Xen onto Nitro between 2017 and 2019.',
+    note:'Lightweight KVM-derived hypervisor with the network/storage offloaded to dedicated Nitro Cards. The hypervisor that runs the world’s largest cloud — and almost nobody outside AWS has ever logged into one.' },
+  { id:'apple-virt', name:'Apple Virtualization', house:'hypervisor', born:2020, ended:null,
+    parents:[{id:'darwin',rel:'derived'}], company:'Apple',
+    chart:'baremetal', clade:'silicon-bound',
+    note:'Apple’s hypervisor framework — Hypervisor.framework dates earlier, but the Apple Silicon era (2020+) made it a serious bare-metal proposition. Substrate of UTM, Parallels, VMware Fusion on M-series, and the official Linux/macOS VM tooling.' },
+
+  // ─── The Substrate House · CoreOS Line ───────────────────────
+  { id:'coreos', name:'CoreOS Container Linux', house:'substrate', born:2013, ended:2020,
+    parents:[{id:'chromeos',rel:'inspired'},{id:'gentoo',rel:'derived'}],
+    company:'CoreOS Inc. → Red Hat (acquired 2018) → IBM',
+    chart:'baremetal', clade:'coreos-line',
+    note:'The founding entry of the clade. Alex Polvi + Brandon Philips, 2013. Took the immutable-root idea from ChromeOS and built it for servers. Acquired by Red Hat in January 2018 ($250M). Discontinued May 2020 in favor of Fedora CoreOS.' },
+  { id:'atomic', name:'Project Atomic', house:'substrate', born:2014, ended:2020,
+    parents:[{id:'fedora',rel:'derived'}], company:'Red Hat',
+    chart:'baremetal', clade:'coreos-line',
+    note:'Red Hat’s pre-acquisition answer to CoreOS. Used rpm-ostree, which became the foundation of Silverblue, Fedora CoreOS, and RHEL CoreOS. Discontinued 2020 — merged with CoreOS Container Linux into Fedora CoreOS.' },
+  { id:'fedora-coreos', name:'Fedora CoreOS', house:'substrate', born:2020, ended:null,
+    parents:[{id:'coreos',rel:'derived'},{id:'atomic',rel:'derived'}],
+    company:'Red Hat · Fedora Project',
+    chart:'baremetal', clade:'coreos-line',
+    note:'The merger of CoreOS Container Linux and Project Atomic. Auto-updating, immutable, container-only. The community upstream of RHEL CoreOS.' },
+  { id:'rhcos', name:'RHEL CoreOS', house:'substrate', born:2018, ended:null,
+    parents:[{id:'rhel',rel:'derived'},{id:'atomic',rel:'derived'}], company:'Red Hat',
+    chart:'baremetal', clade:'coreos-line',
+    note:'The host OS underneath OpenShift. Not user-installable as a standalone product; ships only as part of OpenShift. The most-deployed substrate OS in enterprise Kubernetes.' },
+  { id:'flatcar', name:'Flatcar Container Linux', house:'substrate', born:2018, ended:null,
+    parents:[{id:'coreos',rel:'forked'}], company:'Kinvolk → Microsoft (acquired 2021)',
+    chart:'baremetal', clade:'coreos-line',
+    note:'Friendly fork of CoreOS Container Linux, started when Red Hat’s plans for CoreOS became uncertain. Kept the original architecture and update channels. Acquired by Microsoft in 2021 — and now lives inside Azure.' },
+  { id:'rancheros', name:'RancherOS', house:'substrate', born:2015, ended:2022,
+    parents:[{id:'coreos',rel:'inspired'}], company:'Rancher Labs → SUSE (acquired 2020)',
+    chart:'baremetal', clade:'coreos-line',
+    note:'Everything in containers — including PID 1. The most architecturally radical of the early substrate OSes. Discontinued in favor of k3OS and later Elemental.' },
+
+  // ─── The Substrate House · Vendor Substrates ─────────────────
+  { id:'photonos', name:'Photon OS', house:'substrate', born:2015, ended:null,
+    parents:[{id:'centos',rel:'inspired'}], company:'VMware → Broadcom',
+    chart:'baremetal', clade:'vendor-substrate',
+    note:'VMware’s minimal Linux for running containers on vSphere. Also serves as the appliance OS for some VMware management products. Cross-clade with the commercial-stack lineage.' },
+  { id:'bottlerocket', name:'Bottlerocket', house:'substrate', born:2020, ended:null,
+    parents:[{id:'coreos',rel:'inspired'}], company:'Amazon Web Services',
+    chart:'baremetal', clade:'vendor-substrate',
+    note:'AWS’s container OS. Rust-heavy, A/B partition updates, no shell by default (admin container accessed separately). Optimised for EKS/ECS; runs elsewhere but with strong AWS gravity.' },
+
+  // ─── The Substrate House · Kubernetes-Only ───────────────────
+  { id:'talos', name:'Talos Linux', house:'substrate', born:2018, ended:null,
+    parents:[{id:'coreos',rel:'inspired'}], company:'Sidero Labs',
+    chart:'baremetal', clade:'kubernetes-only',
+    movementNote:'Pre-release 2018, stable releases following. 12 binaries total, no SSH, no shell — all management via gRPC API (talosctl). The most radical minimalism in the clade.',
+    note:'Linux without the Linux operational pattern: no shell, no SSH, API-only. If you cannot do it via talosctl, you cannot do it. Built to run Kubernetes and nothing else.' },
+  { id:'k3os', name:'k3OS', house:'substrate', born:2019, ended:2022,
+    parents:[{id:'rancheros',rel:'derived'}], company:'Rancher Labs → SUSE',
+    chart:'baremetal', clade:'kubernetes-only',
+    note:'Substrate for K3s (lightweight Kubernetes). Discontinued. Replaced by Elemental in the SUSE lineup.' },
+  { id:'kairos', name:'Kairos', house:'substrate', born:2022, ended:null,
+    parents:[{id:'k3os',rel:'inspired'}], company:'community · originally c3os',
+    chart:'baremetal', clade:'kubernetes-only',
+    note:'Immutable container-based OS focused on edge K3s/K8s deployments. The continuation of the k3OS idea after Rancher dropped it.' },
+
+  // ─── The Unicorns (unikernels) ───────────────────────────────
+  { id:'mirageos', name:'MirageOS', house:'unicorn', born:2013, ended:null,
+    parents:[{id:'xen',rel:'derived'}], company:'University of Cambridge · OCaml Labs',
+    chart:'baremetal',
+    note:'The reference unikernel: OCaml all the way down, Xen as substrate. Each application compiles into its own unikernel image with no OS underneath. Anil Madhavapeddy’s project. The most academically rigorous unikernel.' },
+  { id:'osv', name:'OSv', house:'unicorn', born:2013, ended:null,
+    parents:[], company:'Cloudius Systems · → ScyllaDB',
+    chart:'baremetal',
+    note:'Unikernel for unmodified Linux applications — runs a single JVM, single Node, or single anything in its own OS image. Project survived its founders’ pivot to ScyllaDB.' },
+  { id:'includeos', name:'IncludeOS', house:'unicorn', born:2015, ended:null,
+    parents:[], company:'IncludeOS · Norway',
+    chart:'baremetal',
+    note:'C++ unikernel — `#include <os>` and your code becomes a bootable image. The most syntactically charming entry in this house.' },
+  { id:'hermit', name:'HermitCore · Hermit', house:'unicorn', born:2016, ended:null,
+    parents:[], company:'RWTH Aachen · later Hermit Project',
+    chart:'baremetal',
+    note:'HPC-focused unikernel, more recently rewritten in Rust as plain "Hermit". Used in some scientific computing contexts.' },
+  { id:'unikraft', name:'Unikraft', house:'unicorn', born:2017, ended:null,
+    parents:[{id:'mirageos',rel:'inspired'}], company:'EU H2020 research project → Unikraft.io',
+    chart:'baremetal',
+    note:'Build-system-driven unikernel framework — compose your unikernel from a library catalogue. The most commercially serious unikernel effort.' },
+  { id:'nanos', name:'Nanos', house:'unicorn', born:2018, ended:null,
+    parents:[], company:'NanoVMs',
+    chart:'baremetal',
+    note:'Unikernel optimized for running a single Linux ELF binary. Commercial focus. The most pragmatic of the unikernels — accept the Linux ABI rather than rewrite the world.' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1690,11 +2090,11 @@ const HOUSE_PAD_TOP = 22;
 const HOUSE_PAD_BOTTOM = 16;
 const BAR_HEIGHT = 22;
 
-const HOUSE_ORDER = ['mainframe','unix','bsd','apple','dos','nt','altpc','linux','mobile'];
-// Ordered so that lineage lines flow as cleanly as possible:
-// mainframe → unix → bsd → apple (BSD→Mach lineage)
-// dos → nt → altpc (DOS to NT to OS/2)
-// linux at bottom + mobile (Android, etc.)
+const BAR_HEIGHT_TECH = 12;   // half-height bars for kind:'tech' entries
+
+// HOUSE_ORDER kept as a Genealogy default for any legacy reference; the
+// active order comes from CHARTS[activeChart].houseOrder at render time.
+const HOUSE_ORDER = CHARTS.genealogy.houseOrder;
 
 // ═══════════════════════════════════════════════════════════════════
 //  PACKING — assign each OS a row within its house
@@ -1715,15 +2115,42 @@ function buildIndex() {
 
 const { byId, childrenOf } = buildIndex();
 
-// Greedy lane packer — sorts each house's OSES by birth year then assigns
-// each to the first row whose previous entry has ended. Pure: returns
-// row assignments in an object keyed by id, does not mutate OS records.
-function packHouses(includeMovement) {
+// Cross-chart ancestor IDs: every genealogy entry referenced as a parent
+// by some baremetal entry. Rendered as ghost bars in the 'ancestors' lane
+// when the Bare Metal tab is active and the Shared Ancestors toggle is on.
+function collectGhostAncestors() {
+  const ids = new Set();
+  for (const os of OSES) {
+    if (chartOf(os) !== 'baremetal') continue;
+    for (const p of os.parents) {
+      const parent = byId.get(p.id);
+      if (parent && chartOf(parent) === 'genealogy') ids.add(p.id);
+    }
+  }
+  return ids;
+}
+const GHOST_ANCESTOR_IDS = collectGhostAncestors();
+
+// Greedy lane packer per chart.
+//   chart   : 'genealogy' | 'baremetal'
+//   options : { includeMovement, includeAncestors }
+// Movement is genealogy-only; ancestors is baremetal-only.
+function packHouses(chart, options = {}) {
+  const order = CHARTS[chart].houseOrder;
   const layouts = {};
-  for (const house of HOUSE_ORDER) {
-    const oses = OSES
-      .filter(o => o.house === house && (includeMovement || !o.movement))
-      .sort((a, b) => a.born - b.born || a.id.localeCompare(b.id));
+  for (const house of order) {
+    let oses;
+    if (chart === 'baremetal' && house === 'ancestors') {
+      oses = options.includeAncestors
+        ? [...GHOST_ANCESTOR_IDS].map(id => byId.get(id)).filter(Boolean)
+        : [];
+    } else {
+      oses = OSES.filter(o => chartOf(o) === chart && o.house === house);
+      if (chart === 'genealogy' && !options.includeMovement) {
+        oses = oses.filter(o => !o.movement);
+      }
+    }
+    oses = oses.slice().sort((a, b) => a.born - b.born || a.id.localeCompare(b.id));
     const rowsLastEnd = [];
     const rowAssignments = {};
     for (const os of oses) {
@@ -1747,10 +2174,11 @@ function packHouses(includeMovement) {
   return layouts;
 }
 
-function computeHouseGeometry(layouts) {
+function computeHouseGeometry(chart, layouts) {
+  const order = CHARTS[chart].houseOrder;
   let y = MARGIN_TOP;
   const houseY = {};
-  for (const h of HOUSE_ORDER) {
+  for (const h of order) {
     const rows = layouts[h].rows;
     const bandHeight = HOUSE_PAD_TOP + rows * (BAR_HEIGHT + ROW_GAP) - ROW_GAP + HOUSE_PAD_BOTTOM;
     houseY[h] = { top: y, bottom: y + bandHeight, height: bandHeight, rows };
@@ -1764,26 +2192,44 @@ function yearToX(year) {
 }
 
 // Get bar rectangle for an OS in a given layout. Returns null if the OS
-// isn't in the layout (e.g. movement OS in the layer-off layout).
-function osBarRect(os, layout) {
-  const row = layout.layouts[os.house].rowAssignments[os.id];
+// isn't in this layout (movement OS in layer-off; ghost ancestor when the
+// Shared Ancestors toggle is off; OS belonging to the other chart entirely).
+function osBarRect(os, layout, houseOverride) {
+  const house = houseOverride || os.house;
+  const houseLayout = layout.layouts[house];
+  if (!houseLayout) return null;
+  const row = houseLayout.rowAssignments[os.id];
   if (row === undefined) return null;
-  const houseInfo = layout.houseY[os.house];
+  const houseInfo = layout.houseY[house];
+  const h = (os.kind === 'tech') ? BAR_HEIGHT_TECH : BAR_HEIGHT;
   const x1 = yearToX(os.born);
   const x2 = yearToX((os.ended ?? CURRENT_YEAR));
-  const y = houseInfo.top + HOUSE_PAD_TOP + row * (BAR_HEIGHT + ROW_GAP);
-  return { x: x1, y, w: Math.max(8, x2 - x1), h: BAR_HEIGHT, cx: (x1+x2)/2, cy: y + BAR_HEIGHT/2 };
+  // Vertical-center smaller bars in the row slot so they read as "shorter".
+  const slotY = houseInfo.top + HOUSE_PAD_TOP + row * (BAR_HEIGHT + ROW_GAP);
+  const y = slotY + (BAR_HEIGHT - h) / 2;
+  return { x: x1, y, w: Math.max(8, x2 - x1), h, cx: (x1+x2)/2, cy: y + h/2 };
 }
 
-// Two pre-computed layouts: OFF = original 110 entries; ON = all 161.
-const _layoutsOff = packHouses(false);
-const _layoutsOn  = packHouses(true);
-const LAYOUT_OFF = { layouts: _layoutsOff, ...computeHouseGeometry(_layoutsOff) };
-const LAYOUT_ON  = { layouts: _layoutsOn,  ...computeHouseGeometry(_layoutsOn) };
+// Resolve where to draw a bar for an OS in a given chart's layout.
+// In Bare Metal, a Genealogy entry is drawn in the 'ancestors' lane.
+function houseForOS(os, chart) {
+  if (chart === 'baremetal' && chartOf(os) === 'genealogy') return 'ancestors';
+  return os.house;
+}
 
-// Backward-compat aliases (default to OFF — the initial render state).
-const houseY = LAYOUT_OFF.houseY;
-const totalHeight = LAYOUT_OFF.totalHeight;
+// Pre-compute the four layouts: genealogy×{off,on movements}, baremetal×{off,on ancestors}.
+const LAYOUTS = {
+  genealogy: {
+    off: (() => { const ls = packHouses('genealogy', { includeMovement: false }); return { chart:'genealogy', layouts: ls, ...computeHouseGeometry('genealogy', ls) }; })(),
+    on:  (() => { const ls = packHouses('genealogy', { includeMovement: true  }); return { chart:'genealogy', layouts: ls, ...computeHouseGeometry('genealogy', ls) }; })(),
+  },
+  baremetal: {
+    off: (() => { const ls = packHouses('baremetal', { includeAncestors: false }); return { chart:'baremetal', layouts: ls, ...computeHouseGeometry('baremetal', ls) }; })(),
+    on:  (() => { const ls = packHouses('baremetal', { includeAncestors: true  }); return { chart:'baremetal', layouts: ls, ...computeHouseGeometry('baremetal', ls) }; })(),
+  },
+};
+const LAYOUT_OFF = LAYOUTS.genealogy.off;
+const LAYOUT_ON  = LAYOUTS.genealogy.on;
 const totalWidth = yearToX(YEAR_MAX) + MARGIN_RIGHT;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1793,8 +2239,8 @@ const totalWidth = yearToX(YEAR_MAX) + MARGIN_RIGHT;
 const NS = 'http://www.w3.org/2000/svg';
 const svg = document.getElementById('chart');
 svg.setAttribute('width', totalWidth);
-svg.setAttribute('height', totalHeight);
-svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+svg.setAttribute('height', LAYOUT_OFF.totalHeight);
+svg.setAttribute('viewBox', `0 0 ${totalWidth} ${LAYOUT_OFF.totalHeight}`);
 
 function el(tag, attrs={}, parent=svg) {
   const e = document.createElementNS(NS, tag);
@@ -1804,10 +2250,9 @@ function el(tag, attrs={}, parent=svg) {
 }
 
 // ─── Re-runnable chrome rendering ──────────────────────────
-// Bands, labels, axis, decade rules, and lineage lines are re-rendered
-// from scratch whenever the active layout changes (e.g. layer toggle).
-// Bars themselves are rendered once at LAYOUT_OFF position and slide
-// to LAYOUT_ON via CSS transform on a body class — see bar loop below.
+// Bands, labels, axis, decade rules, lineages, and bars are re-rendered
+// on tab switch. Within a tab, the layer toggle uses the established
+// "two pre-computed layouts + per-bar --delta-y" reflow animation.
 
 const bandsG    = el('g', { class: 'bands' });
 const labelsG   = el('g', { class: 'house-labels' });
@@ -1815,10 +2260,11 @@ const axisTopG  = el('g', { class: 'axis-top' });
 const axisBotG  = el('g', { class: 'axis-bot' });
 const decadeG   = el('g', { class: 'decade-rules' });
 const lineagesG = el('g', { class: 'lineages' });
+const barsG     = el('g', { class: 'bars' });
 
-// Sticky overlay backdrop + fade — built once, height updated on toggle.
+// Sticky overlay backdrop + fade — height updated on every re-render.
 const stickyBg = el('rect', {
-  x: 0, y: 0, width: MARGIN_LEFT, height: totalHeight,
+  x: 0, y: 0, width: MARGIN_LEFT, height: LAYOUT_OFF.totalHeight,
   class: 'sticky-bg',
   'pointer-events': 'all',
 }, labelsG);
@@ -1827,21 +2273,31 @@ const grad = el('linearGradient',
   { id: 'sticky-fade-grad', x1: '0', x2: '1', y1: '0', y2: '0' }, defs);
 el('stop', { offset: '0%',   'stop-color': '#0c0a07', 'stop-opacity': '1' }, grad);
 el('stop', { offset: '100%', 'stop-color': '#0c0a07', 'stop-opacity': '0' }, grad);
+// Hatch pattern used by foundational-tech bars (kind:'tech') in baremetal.
+// Pattern fill is fixed; the bar's stroke carries the house colour.
+const hatch = el('pattern', {
+  id: 'tech-hatch', patternUnits: 'userSpaceOnUse', width: '5', height: '5',
+  patternTransform: 'rotate(45)'
+}, defs);
+el('line', { x1: 0, y1: 0, x2: 0, y2: 5, stroke: '#c9c3b3', 'stroke-width': 1.4, 'stroke-opacity': '0.55' }, hatch);
 const stickyFade = el('rect', {
-  x: MARGIN_LEFT, y: 0, width: 28, height: totalHeight,
+  x: MARGIN_LEFT, y: 0, width: 28, height: LAYOUT_OFF.totalHeight,
   fill: 'url(#sticky-fade-grad)',
   class: 'sticky-fade',
 }, labelsG);
-// Sub-group for the per-house text labels — cleared on re-render.
 const houseTextG = el('g', { class: 'house-text' }, labelsG);
 
 function clearChildren(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
 }
 
+function chartFromLayout(layout) { return CHARTS[layout.chart]; }
+function houseMap(layout)        { return chartFromLayout(layout).houses; }
+function houseOrder(layout)      { return chartFromLayout(layout).houseOrder; }
+
 function renderBands(layout) {
   clearChildren(bandsG);
-  HOUSE_ORDER.forEach((h, i) => {
+  houseOrder(layout).forEach((h, i) => {
     const info = layout.houseY[h];
     el('rect', {
       x: 0, y: info.top, width: totalWidth, height: info.height,
@@ -1861,9 +2317,11 @@ function renderBands(layout) {
 
 function renderHouseLabels(layout) {
   clearChildren(houseTextG);
-  HOUSE_ORDER.forEach(h => {
+  const houses = houseMap(layout);
+  houseOrder(layout).forEach(h => {
     const info = layout.houseY[h];
-    const HC = HOUSES[h];
+    const HC = houses[h];
+    if (!HC) return;
     const cy = info.top + info.height / 2;
     el('text', {
       x: 24, y: cy - 14, class: 'house-label-id', fill: HC.color
@@ -1911,34 +2369,41 @@ function renderDecadeRules(layout) {
   }
 }
 
-function lineageColor(childHouse) { return HOUSES[childHouse].color; }
+function lineageColor(layout, childHouse) {
+  return houseMap(layout)[childHouse]?.color || HOUSES_GENEALOGY[childHouse]?.color || 'var(--muted)';
+}
 
-// Lineage paths are re-rendered on every layout change. lineageLines is
-// the canonical array used by interaction code (highlight, bloodline);
-// we keep its shape stable across re-renders.
+// Lineage paths — re-rendered on layer toggle (same chart) and tab swap.
 const lineageLines = [];
 
 function renderLineages(layout) {
   clearChildren(lineagesG);
   lineageLines.length = 0;
+  const chart = layout.chart;
   for (const os of OSES) {
+    if (chartOf(os) !== chart) continue; // only lines whose CHILD is in this chart
+    const childHouse = houseForOS(os, chart);
+    const cr = osBarRect(os, layout, childHouse);
+    if (!cr) continue;
     for (const p of os.parents) {
       const parent = byId.get(p.id);
       if (!parent) continue;
-      const pr = osBarRect(parent, layout);
-      const cr = osBarRect(os, layout);
-      if (!pr || !cr) continue; // either endpoint absent from this layout
+      const parentHouse = houseForOS(parent, chart);
+      const pr = osBarRect(parent, layout, parentHouse);
+      if (!pr) continue;
       const x1 = pr.x + pr.w, y1 = pr.y + pr.h / 2;
       const x2 = cr.x,        y2 = cr.y + cr.h / 2;
       const dx = Math.max(20, (x2 - x1) * 0.45);
       const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-      const movementInvolved = os.movement === true || parent.movement === true;
+      const movementInvolved = chart === 'genealogy' && (os.movement === true || parent.movement === true);
+      const crossChart = parentHouse === 'ancestors';
       const line = el('path', {
         d: path,
-        stroke: lineageColor(os.house),
+        stroke: lineageColor(layout, childHouse),
         class: 'lineage-line'
           + (p.rel === 'derived' ? '' : ' dashed')
-          + (movementInvolved ? ' lineage-movement' : ''),
+          + (movementInvolved ? ' lineage-movement' : '')
+          + (crossChart ? ' lineage-cross' : ''),
         'data-parent': parent.id,
         'data-child': os.id,
         'data-rel': p.rel,
@@ -1948,91 +2413,106 @@ function renderLineages(layout) {
   }
 }
 
-// Initial render at LAYOUT_OFF — the current 110-bar chart.
-renderBands(LAYOUT_OFF);
-renderHouseLabels(LAYOUT_OFF);
-renderAxis(axisTopG, MARGIN_TOP - 24, true);
-renderAxis(axisBotG, LAYOUT_OFF.totalHeight - MARGIN_BOTTOM + 14, false);
-renderDecadeRules(LAYOUT_OFF);
-renderLineages(LAYOUT_OFF);
-
-// — bars (rendered once; non-movement bars translate via CSS on toggle) —
-const barsG = el('g', { class: 'bars' });
+// Bars: full clear-and-rebuild on chart switch; within-chart layer toggle
+// uses --delta-y on existing groups for animated reflow.
 const barGroupById = new Map();
-for (const os of OSES) {
-  const isMovement = os.movement === true;
-  // Non-movement bars sit at their LAYOUT_OFF position; movement bars only
-  // exist in LAYOUT_ON and are rendered there directly (hidden until toggle).
-  const rOff = osBarRect(os, LAYOUT_OFF);
-  const rOn  = osBarRect(os, LAYOUT_ON);
-  const r = isMovement ? rOn : rOff;
-  const house = HOUSES[os.house];
 
-  const classes = ['os-bar-group'];
-  if (isMovement) classes.push('movement');
-  if (os.clade) classes.push('clade-' + os.clade);
+function renderBars(layoutOff, layoutOn) {
+  clearChildren(barsG);
+  barGroupById.clear();
+  const chart = layoutOff.chart;
+  const houses = CHARTS[chart].houses;
 
-  const g = el('g', {
-    class: classes.join(' '),
-    'data-id': os.id,
-    'data-house': os.house,
-  }, barsG);
-  // delta-y drives the CSS transform when body.layer-on is applied
-  if (!isMovement && rOn) {
-    const deltaY = rOn.y - rOff.y;
-    if (deltaY !== 0) g.style.setProperty('--delta-y', deltaY + 'px');
-  }
+  for (const os of OSES) {
+    if (chartOf(os) !== chart) {
+      // Genealogy entries appear in Bare Metal only as ghost ancestors.
+      if (!(chart === 'baremetal' && GHOST_ANCESTOR_IDS.has(os.id))) continue;
+    }
+    const house = houseForOS(os, chart);
+    const isGhost = (house === 'ancestors');
+    const isMovement = chart === 'genealogy' && os.movement === true;
 
-  el('rect', {
-    x: r.x, y: r.y, width: r.w, height: r.h,
-    class: 'os-bar-bg'
-  }, g);
-  el('rect', {
-    x: r.x, y: r.y, width: r.w, height: r.h,
-    class: 'os-bar',
-    fill: house.color, stroke: house.color
-  }, g);
+    const rOff = osBarRect(os, layoutOff, house);
+    const rOn  = osBarRect(os, layoutOn,  house);
+    // Movement bars: only exist in layer-on; ghost bars: only exist in
+    // ancestors-on. In both cases anchor at the ON position and fade in.
+    const r = (isMovement || isGhost) ? rOn : (rOff || rOn);
+    if (!r) continue;
 
-  if (os.ended === null) {
-    const ax = r.x + r.w;
-    const ay = r.y + r.h / 2;
-    el('path', {
-      d: `M ${ax} ${ay - 5} L ${ax + 8} ${ay} L ${ax} ${ay + 5} Z`,
-      fill: house.color,
-      class: 'os-arrow-cap'
+    const HC = houses[house];
+
+    const classes = ['os-bar-group'];
+    if (isMovement) classes.push('movement');
+    if (isGhost)    classes.push('ghost');
+    if (os.kind === 'tech') classes.push('tech');
+    if (os.clade)   classes.push('clade-' + os.clade);
+
+    const g = el('g', {
+      class: classes.join(' '),
+      'data-id': os.id,
+      'data-house': house,
+      'data-chart': chart,
+    }, barsG);
+
+    // Animated reflow on layer toggle (genealogy only). Ghost bars and
+    // movement bars fade in rather than slide; their --delta-y stays 0.
+    if (!isMovement && !isGhost && rOff && rOn) {
+      const deltaY = rOn.y - rOff.y;
+      if (deltaY !== 0) g.style.setProperty('--delta-y', deltaY + 'px');
+    }
+
+    el('rect', {
+      x: r.x, y: r.y, width: r.w, height: r.h,
+      class: 'os-bar-bg'
     }, g);
+    el('rect', {
+      x: r.x, y: r.y, width: r.w, height: r.h,
+      class: 'os-bar',
+      fill: HC.color, stroke: HC.color
+    }, g);
+
+    if (os.ended === null && !isGhost) {
+      const ax = r.x + r.w;
+      const ay = r.y + r.h / 2;
+      el('path', {
+        d: `M ${ax} ${ay - 5} L ${ax + 8} ${ay} L ${ax} ${ay + 5} Z`,
+        fill: HC.color,
+        class: 'os-arrow-cap'
+      }, g);
+    }
+
+    const label = isGhost ? (os.name + '  ↗') : os.name;
+    const approxTextW = label.length * 6.4 + 12;
+    if (r.w >= approxTextW + 6 && r.h >= 18) {
+      el('text', {
+        x: r.x + 7, y: r.y + r.h / 2,
+        class: 'os-label' + (isGhost ? ' ghost-label' : ''),
+        fill: isGhost ? 'var(--muted)' : 'var(--text)'
+      }, g).textContent = label;
+    } else {
+      el('text', {
+        x: r.x + r.w + 8, y: r.y + r.h / 2,
+        class: 'os-label' + (isGhost ? ' ghost-label' : ''),
+        fill: isGhost ? 'var(--muted)' : 'var(--text-2)'
+      }, g).textContent = label;
+    }
+
+    barGroupById.set(os.id, g);
+
+    g.addEventListener('mouseenter', () => onBarHover(os.id, true));
+    g.addEventListener('mouseleave', () => onBarHover(os.id, false));
+    g.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      // Ghost bar click switches to Genealogy and selects the entry there.
+      if (isGhost) { setChart('genealogy', { selectId: os.id }); return; }
+      onBarClick(os.id);
+    });
   }
-
-  const label = os.name;
-  const approxTextW = label.length * 6.4 + 12;
-  if (r.w >= approxTextW + 6) {
-    el('text', {
-      x: r.x + 7, y: r.y + r.h / 2,
-      class: 'os-label',
-      fill: 'var(--text)'
-    }, g).textContent = label;
-  } else {
-    el('text', {
-      x: r.x + r.w + 8, y: r.y + r.h / 2,
-      class: 'os-label',
-      fill: 'var(--text-2)'
-    }, g).textContent = label;
-  }
-
-  barGroupById.set(os.id, g);
-
-  g.addEventListener('mouseenter', () => onBarHover(os.id, true));
-  g.addEventListener('mouseleave', () => onBarHover(os.id, false));
-  g.addEventListener('click', (ev) => { ev.stopPropagation(); onBarClick(os.id); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  STICKY HOUSE LABELS + INITIAL SCROLL
+//  STICKY HOUSE LABELS — must exist before first renderChartTo() call
 // ═══════════════════════════════════════════════════════════════════
-
-// Move labels group to the top of the z-order so it sits above bars,
-// then translate it horizontally to track chart-wrap.scrollLeft.
-svg.appendChild(labelsG);
 
 const chartWrap = document.getElementById('chartWrap');
 let stickyRaf = 0;
@@ -2044,7 +2524,32 @@ chartWrap.addEventListener('scroll', () => {
   if (stickyRaf) return;
   stickyRaf = requestAnimationFrame(updateStickyOverlay);
 }, { passive: true });
-updateStickyOverlay();
+
+// One-shot re-render of every chart element. `current` selects which
+// of the two layouts is the visually-presented one (drives heights and
+// the chrome — bands, lineages, axes); the layout pair drives the bars
+// and their per-bar --delta-y so the layer toggle animates smoothly.
+function renderChartTo(layoutOff, layoutOn, current) {
+  const cur = current || layoutOff;
+  renderBands(cur);
+  renderHouseLabels(cur);
+  renderAxis(axisTopG, MARGIN_TOP - 24, true);
+  renderAxis(axisBotG, cur.totalHeight - MARGIN_BOTTOM + 14, false);
+  renderDecadeRules(cur);
+  renderLineages(cur);
+  renderBars(layoutOff, layoutOn);
+
+  svg.setAttribute('height', cur.totalHeight);
+  svg.setAttribute('viewBox', `0 0 ${totalWidth} ${cur.totalHeight}`);
+  chartWrap.style.height = cur.totalHeight + 'px';
+  stickyBg.setAttribute('height', cur.totalHeight);
+  stickyFade.setAttribute('height', cur.totalHeight);
+  svg.appendChild(labelsG); // re-stack labels above bars
+  updateStickyOverlay();
+}
+
+// Initial render: Genealogy, layer off.
+renderChartTo(LAYOUTS.genealogy.off, LAYOUTS.genealogy.on, LAYOUTS.genealogy.off);
 
 // On small screens, the leftmost years are obscure mainframes — land somewhere
 // recognizable so the page makes sense at first paint on a phone.
@@ -2055,12 +2560,28 @@ if (window.matchMedia('(max-width: 720px)').matches) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  INTERACTION
+//  INTERACTION + CHART STATE
 // ═══════════════════════════════════════════════════════════════════
 
-let selectedId = null;
-let filterHouse = 'all';
+// Per-tab independent state. Selection clears on tab switch; search is
+// shared so a query made on one tab carries to the other.
+const tabState = {
+  genealogy: { filterHouse: 'all', layerOn: false, selectedId: null },
+  baremetal: { filterHouse: 'all', layerOn: true,  selectedId: null }, // Shared Ancestors default ON
+};
+let activeChart = 'genealogy';
 let searchTerm = '';
+let selectedId = null;       // mirror of tabState[activeChart].selectedId
+let filterHouse = 'all';     // mirror of tabState[activeChart].filterHouse
+let showMovements = false;   // mirror of tabState.genealogy.layerOn
+let showAncestors = true;    // mirror of tabState.baremetal.layerOn
+let currentLayout = LAYOUT_OFF;
+function activeLayouts() {
+  const layers = LAYOUTS[activeChart];
+  return activeChart === 'genealogy'
+    ? { off: layers.off, on: layers.on, current: showMovements ? layers.on : layers.off }
+    : { off: layers.off, on: layers.on, current: showAncestors ? layers.on : layers.off };
+}
 
 function getAncestors(id, set = new Set()) {
   const os = byId.get(id);
@@ -2135,28 +2656,31 @@ function onBarHover(id, isEntering) {
 function onBarClick(id) {
   if (selectedId === id) {
     selectedId = null;
+    tabState[activeChart].selectedId = null;
     closeDetail();
     clearHighlight();
     return;
   }
   selectedId = id;
+  tabState[activeChart].selectedId = id;
   applyHighlight(bloodline(id));
   openDetail(id);
-  // scroll to bring bar into view (x is layout-independent — depends only on year)
+  // scroll to bring bar into view
   const os = byId.get(id);
-  const r = osBarRect(os, currentLayout);
+  const house = houseForOS(os, activeChart);
+  const r = osBarRect(os, currentLayout, house);
   if (r) {
-    const wrap = document.getElementById('chartWrap');
-    const desiredScroll = r.x - wrap.clientWidth / 2 + r.w / 2;
-    wrap.scrollTo({ left: Math.max(0, desiredScroll), behavior: 'smooth' });
+    const desiredScroll = r.x - chartWrap.clientWidth / 2 + r.w / 2;
+    chartWrap.scrollTo({ left: Math.max(0, desiredScroll), behavior: 'smooth' });
   }
 }
 
-document.getElementById('chartWrap').addEventListener('click', (ev) => {
+chartWrap.addEventListener('click', (ev) => {
   // click on empty area deselects
   if (ev.target === svg || ev.target.closest('.bands') || ev.target.closest('.house-labels')) {
     if (selectedId) {
       selectedId = null;
+      tabState[activeChart].selectedId = null;
       closeDetail();
       clearHighlight();
     }
@@ -2167,6 +2691,7 @@ document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') {
     if (selectedId) {
       selectedId = null;
+      tabState[activeChart].selectedId = null;
       closeDetail();
       clearHighlight();
     }
@@ -2181,38 +2706,70 @@ const detailRail = document.getElementById('detailRail');
 const detailContent = document.getElementById('detailContent');
 document.getElementById('detailClose').addEventListener('click', () => {
   selectedId = null;
+  tabState[activeChart].selectedId = null;
   closeDetail();
   clearHighlight();
 });
 
 function closeDetail() { detailRail.classList.remove('open'); }
 
+// Resolve display info for any entry, regardless of chart.
+function osDisplayHouse(os) {
+  const chart = chartOf(os);
+  return CHARTS[chart].houses[os.house] || HOUSES_GENEALOGY[os.house];
+}
+function osDotColor(os) { return osDisplayHouse(os)?.color || 'var(--muted)'; }
+
 function openDetail(id) {
   const os = byId.get(id);
-  const house = HOUSES[os.house];
+  const osChart = chartOf(os);
+  const house = osDisplayHouse(os);
   const parents = os.parents.map(p => ({ os: byId.get(p.id), rel: p.rel })).filter(x => x.os);
-  const children = (childrenOf.get(id) || []).map(c => ({ os: byId.get(c.id), rel: c.rel })).filter(x => x.os);
+  const childrenAll = (childrenOf.get(id) || []).map(c => ({ os: byId.get(c.id), rel: c.rel })).filter(x => x.os);
+  const childrenSame  = childrenAll.filter(c => chartOf(c.os) === osChart);
+  const childrenOther = childrenAll.filter(c => chartOf(c.os) !== osChart);
   const ended = os.ended ?? CURRENT_YEAR;
   const span = ended - os.born;
   const status = os.ended === null ? 'still alive' : `ended ${os.ended}`;
 
-  const clade = os.movement && os.clade ? CLADES[os.clade] : null;
-  const movementBadge = clade ? `
-    <div class="detail-movement-badge">
-      <span class="clade-dot" style="background:${clade.accent};"></span>
-      <span class="free-peoples">The Free Peoples</span>
-      <span style="color:var(--faint);">·</span>
-      ${clade.short}
-    </div>` : '';
-  const movementNote = (clade && os.movementNote) ? `
+  // Clade badge: Free Peoples on genealogy chart; chart-native clade on baremetal.
+  const clade = os.clade ? CLADES_ALL[os.clade] : null;
+  let badge = '';
+  if (clade) {
+    if (osChart === 'genealogy' && os.movement) {
+      badge = `
+        <div class="detail-movement-badge">
+          <span class="clade-dot" style="background:${clade.accent};"></span>
+          <span class="free-peoples">The Free Peoples</span>
+          <span style="color:var(--faint);">·</span>
+          ${clade.short}
+        </div>`;
+    } else if (osChart === 'baremetal') {
+      badge = `
+        <div class="detail-movement-badge detail-baremetal-badge">
+          <span class="clade-dot" style="background:${clade.accent};"></span>
+          <span class="free-peoples">Bare Metal</span>
+          <span style="color:var(--faint);">·</span>
+          ${clade.short}${os.kind === 'tech' ? '<span style="color:var(--faint); margin-left:8px;">· foundational tech</span>' : ''}
+        </div>`;
+    }
+  }
+  const movementNote = (os.movementNote) ? `
     <p class="detail-movement-note">${os.movementNote}</p>` : '';
+
+  const renderItem = (item) => `
+    <li data-jump="${item.os.id}" data-cross="${chartOf(item.os) !== activeChart ? '1' : '0'}">
+      <span class="dot" style="background:${osDotColor(item.os)};"></span>
+      ${item.os.name}${chartOf(item.os) !== activeChart ? ' <span class="cross-arrow">↗</span>' : ''}
+      <span class="rel">${item.rel}</span>
+    </li>`;
 
   detailContent.innerHTML = `
     <div class="detail-house-id" style="--dot:${house.color};">
       <span style="background:${house.color}; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
       ${house.name}
     </div>
-    ${movementBadge}
+    ${badge}
     <h2 class="detail-name">${os.name}</h2>
     <div class="detail-company">${os.company}</div>
     <div class="detail-dates">
@@ -2227,35 +2784,36 @@ function openDetail(id) {
       <ul class="detail-list">
         ${parents.length === 0
           ? '<li class="empty">A house founder. No prior lineage in this chart.</li>'
-          : parents.map(p => `
-            <li data-jump="${p.os.id}">
-              <span class="dot" style="background:${HOUSES[p.os.house].color};"></span>
-              ${p.os.name}
-              <span class="rel">${p.rel}</span>
-            </li>`).join('')}
+          : parents.map(renderItem).join('')}
       </ul>
     </div>
 
     <div class="detail-section">
       <div class="detail-section-label">Begat</div>
       <ul class="detail-list">
-        ${children.length === 0
+        ${childrenSame.length === 0
           ? '<li class="empty">No descendants in this chart.</li>'
-          : children.map(c => `
-            <li data-jump="${c.os.id}">
-              <span class="dot" style="background:${HOUSES[c.os.house].color};"></span>
-              ${c.os.name}
-              <span class="rel">${c.rel}</span>
-            </li>`).join('')}
+          : childrenSame.map(renderItem).join('')}
       </ul>
     </div>
+    ${childrenOther.length > 0 ? `
+    <div class="detail-section">
+      <div class="detail-section-label">${osChart === 'genealogy' ? 'Bare Metal descendants' : 'Genealogy descendants'}</div>
+      <ul class="detail-list">
+        ${childrenOther.map(renderItem).join('')}
+      </ul>
+    </div>` : ''}
   `;
 
-  // wire up "jump to" links
+  // wire up "jump to" links — cross-chart jumps swap tabs first
   detailContent.querySelectorAll('[data-jump]').forEach(li => {
     li.addEventListener('click', () => {
       const jumpId = li.getAttribute('data-jump');
-      onBarClick(jumpId);
+      const targetOs = byId.get(jumpId);
+      if (!targetOs) return;
+      const targetChart = chartOf(targetOs);
+      if (targetChart !== activeChart) setChart(targetChart, { selectId: jumpId });
+      else onBarClick(jumpId);
     });
   });
 
@@ -2269,21 +2827,25 @@ function openDetail(id) {
 function applyFilters() {
   for (const [id, g] of barGroupById) {
     const os = byId.get(id);
-    let visible = true;
-    // Movement bars: hidden via CSS when layer off (don't override here).
-    if (os.movement && !showMovements) {
+    // Movement bars on genealogy: visibility is gated by CSS via .movement
+    // + body.layer-on. Ghost ancestor bars on baremetal: gated by .ghost +
+    // body.ancestors-on. Don't fight either with inline styles.
+    const isGhost = g.classList.contains('ghost');
+    const isMovement = g.classList.contains('movement');
+    if ((isMovement && !showMovements) || (isGhost && !showAncestors)) {
       g.style.opacity = '';
       g.style.pointerEvents = '';
       continue;
     }
-    if (filterHouse !== 'all' && os.house !== filterHouse) visible = false;
-    if (searchTerm && !os.name.toLowerCase().includes(searchTerm) && !os.company.toLowerCase().includes(searchTerm)) {
+    let visible = true;
+    const houseForFilter = isGhost ? 'ancestors' : os.house;
+    if (filterHouse !== 'all' && houseForFilter !== filterHouse) visible = false;
+    if (searchTerm && !os.name.toLowerCase().includes(searchTerm) && !(os.company || '').toLowerCase().includes(searchTerm)) {
       visible = false;
     }
     g.style.opacity = visible ? '' : '0.15';
     g.style.pointerEvents = visible ? '' : 'none';
   }
-  // dim lineage lines whose endpoints are filtered out
   for (const ln of lineageLines) {
     const pOs = byId.get(ln.parentId);
     const cOs = byId.get(ln.childId);
@@ -2293,104 +2855,299 @@ function applyFilters() {
   }
 }
 
-document.querySelectorAll('.chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    filterHouse = chip.getAttribute('data-house');
-    applyFilters();
-  });
-});
-
 document.getElementById('searchInput').addEventListener('input', (ev) => {
   searchTerm = ev.target.value.trim().toLowerCase();
   applyFilters();
 });
 
-// ─── Layer toggle: The Free Peoples ───
-let showMovements = false;
-let currentLayout = LAYOUT_OFF;
+// ─── House chips per chart ──────────────────────────────────
+// The chip strip is rebuilt on every tab switch so it lists the active
+// chart's houses (and only those). Clicking a chip filters within tab.
+function renderHouseChips() {
+  const wrap = document.getElementById('houseChips');
+  clearChildren(wrap);
+  const C = CHARTS[activeChart];
+  const allBtn = document.createElement('button');
+  allBtn.className = 'chip chip-all' + (filterHouse === 'all' ? ' active' : '');
+  allBtn.dataset.house = 'all';
+  allBtn.textContent = 'All';
+  wrap.appendChild(allBtn);
+  for (const h of C.houseOrder) {
+    if (h === 'ancestors') continue; // not a filterable house
+    const HC = C.houses[h];
+    const b = document.createElement('button');
+    b.className = 'chip' + (filterHouse === h ? ' active' : '');
+    b.dataset.house = h;
+    b.style.setProperty('--chip-color', HC.color);
+    b.textContent = HC.short;
+    wrap.appendChild(b);
+  }
+  wrap.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      wrap.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      filterHouse = chip.dataset.house;
+      tabState[activeChart].filterHouse = filterHouse;
+      applyFilters();
+    });
+  });
+}
+
+// ─── Layer toggle (chart-aware) ─────────────────────────────
+// Genealogy: "The Free Peoples" (default OFF).
+// Bare Metal: "Shared Ancestors" (default ON).
+function renderLayerToggle() {
+  const btn = document.getElementById('layerToggle');
+  if (activeChart === 'genealogy') {
+    btn.querySelector('.layer-title').textContent = 'The Free Peoples';
+    btn.querySelector('.layer-sub').textContent = 'the open source movements';
+    btn.setAttribute('aria-pressed', showMovements ? 'true' : 'false');
+    btn.setAttribute('aria-label', 'Toggle The Free Peoples — the open source movements layer');
+  } else {
+    btn.querySelector('.layer-title').textContent = 'Shared Ancestors';
+    btn.querySelector('.layer-sub').textContent = 'ghosted from the genealogy chart';
+    btn.setAttribute('aria-pressed', showAncestors ? 'true' : 'false');
+    btn.setAttribute('aria-label', 'Toggle Shared Ancestors — ghosted cross-chart references');
+  }
+}
 
 function setLayer(on) {
-  if (on === showMovements) return;
-  showMovements = on;
-  currentLayout = on ? LAYOUT_ON : LAYOUT_OFF;
-
-  // Grow SVG canvas BEFORE the CSS transform fires so translated bars are
-  // not clipped by the smaller viewBox during the slide.
-  svg.setAttribute('height', currentLayout.totalHeight);
-  svg.setAttribute('viewBox', `0 0 ${totalWidth} ${currentLayout.totalHeight}`);
-  // chart-wrap height transitions via CSS (rule above).
-  chartWrap.style.height = currentLayout.totalHeight + 'px';
-
-  // Body class triggers the per-bar CSS transform and the movement fade.
-  document.body.classList.toggle('layer-on', on);
-
-  // Re-render the chrome that depends on house geometry.
-  renderBands(currentLayout);
-  renderHouseLabels(currentLayout);
-  renderAxis(axisBotG, currentLayout.totalHeight - MARGIN_BOTTOM + 14, false);
-  renderDecadeRules(currentLayout);
-  renderLineages(currentLayout);
-
-  // Update sticky overlay heights & put labels back on top of bars.
-  stickyBg.setAttribute('height', currentLayout.totalHeight);
-  stickyFade.setAttribute('height', currentLayout.totalHeight);
-  svg.appendChild(labelsG);
-  updateStickyOverlay();
-
-  // Lineage paths were replaced; re-apply current highlight (if any).
-  if (selectedId) applyHighlight(bloodline(selectedId));
-  else applyFilters();
-
-  document.getElementById('layerToggle').setAttribute('aria-pressed', on ? 'true' : 'false');
+  if (activeChart === 'genealogy') {
+    if (on === showMovements) return;
+    showMovements = on;
+    tabState.genealogy.layerOn = on;
+    currentLayout = on ? LAYOUTS.genealogy.on : LAYOUTS.genealogy.off;
+    svg.setAttribute('height', currentLayout.totalHeight);
+    svg.setAttribute('viewBox', `0 0 ${totalWidth} ${currentLayout.totalHeight}`);
+    chartWrap.style.height = currentLayout.totalHeight + 'px';
+    document.body.classList.toggle('layer-on', on);
+    renderBands(currentLayout);
+    renderHouseLabels(currentLayout);
+    renderAxis(axisBotG, currentLayout.totalHeight - MARGIN_BOTTOM + 14, false);
+    renderDecadeRules(currentLayout);
+    renderLineages(currentLayout);
+    stickyBg.setAttribute('height', currentLayout.totalHeight);
+    stickyFade.setAttribute('height', currentLayout.totalHeight);
+    svg.appendChild(labelsG);
+    updateStickyOverlay();
+    if (selectedId) applyHighlight(bloodline(selectedId));
+    else applyFilters();
+  } else {
+    if (on === showAncestors) return;
+    showAncestors = on;
+    tabState.baremetal.layerOn = on;
+    currentLayout = on ? LAYOUTS.baremetal.on : LAYOUTS.baremetal.off;
+    svg.setAttribute('height', currentLayout.totalHeight);
+    svg.setAttribute('viewBox', `0 0 ${totalWidth} ${currentLayout.totalHeight}`);
+    chartWrap.style.height = currentLayout.totalHeight + 'px';
+    document.body.classList.toggle('ancestors-on', on);
+    renderBands(currentLayout);
+    renderHouseLabels(currentLayout);
+    renderAxis(axisBotG, currentLayout.totalHeight - MARGIN_BOTTOM + 14, false);
+    renderDecadeRules(currentLayout);
+    renderLineages(currentLayout);
+    stickyBg.setAttribute('height', currentLayout.totalHeight);
+    stickyFade.setAttribute('height', currentLayout.totalHeight);
+    svg.appendChild(labelsG);
+    updateStickyOverlay();
+    if (selectedId) applyHighlight(bloodline(selectedId));
+    else applyFilters();
+  }
+  renderLayerToggle();
 }
 
 document.getElementById('layerToggle').addEventListener('click', () => {
-  setLayer(!showMovements);
+  const cur = activeChart === 'genealogy' ? showMovements : showAncestors;
+  setLayer(!cur);
 });
 
 // ═══════════════════════════════════════════════════════════════════
-//  LEGEND
+//  TAB SYSTEM (chart switcher)
+// ═══════════════════════════════════════════════════════════════════
+
+function setChart(chart, opts = {}) {
+  if (!CHARTS[chart]) return;
+  if (chart === activeChart && !opts.force) {
+    if (opts.selectId) onBarClick(opts.selectId);
+    return;
+  }
+  document.body.classList.add('chart-swapping');
+  // Brief fade-out, swap, fade back in. setTimeout (not rAF) so the swap
+  // still happens reliably under headless rendering with virtual time.
+  setTimeout(() => {
+    _setChartImpl(chart, opts);
+    renderLegend();
+    setTimeout(() => document.body.classList.remove('chart-swapping'), 16);
+  }, 140);
+}
+function _setChartImpl(chart, opts = {}) {
+  // Persist state of the leaving tab.
+  tabState[activeChart].selectedId = selectedId;
+  tabState[activeChart].filterHouse = filterHouse;
+  if (activeChart === 'genealogy') tabState.genealogy.layerOn = showMovements;
+  else                             tabState.baremetal.layerOn = showAncestors;
+
+  // Close detail + clear selection on switch (per brief).
+  if (selectedId) closeDetail();
+  selectedId = null;
+  tabState[chart].selectedId = opts.selectId || null;
+
+  activeChart = chart;
+  filterHouse = tabState[chart].filterHouse;
+  showMovements = chart === 'genealogy' ? tabState.genealogy.layerOn : false;
+  showAncestors = chart === 'baremetal' ? tabState.baremetal.layerOn : true;
+  document.body.classList.toggle('layer-on', activeChart === 'genealogy' && showMovements);
+  document.body.classList.toggle('ancestors-on', activeChart === 'baremetal' && showAncestors);
+  document.body.classList.toggle('chart-baremetal', activeChart === 'baremetal');
+
+  const layers = LAYOUTS[chart];
+  currentLayout = (chart === 'genealogy'
+      ? (showMovements ? layers.on : layers.off)
+      : (showAncestors ? layers.on : layers.off));
+
+  renderChartTo(layers.off, layers.on, currentLayout);
+  renderHouseChips();
+  renderLayerToggle();
+  renderTabs();
+  updateMasthead();
+
+  // Apply selection if requested (after bars are rebuilt).
+  if (opts.selectId) {
+    selectedId = opts.selectId;
+    tabState[chart].selectedId = opts.selectId;
+    if (barGroupById.has(opts.selectId)) {
+      applyHighlight(bloodline(opts.selectId));
+      openDetail(opts.selectId);
+      const os = byId.get(opts.selectId);
+      const r = osBarRect(os, currentLayout, houseForOS(os, activeChart));
+      if (r) {
+        const desiredScroll = r.x - chartWrap.clientWidth / 2 + r.w / 2;
+        chartWrap.scrollTo({ left: Math.max(0, desiredScroll), behavior: 'smooth' });
+      }
+    } else {
+      applyFilters();
+    }
+  } else if (tabState[chart].selectedId && barGroupById.has(tabState[chart].selectedId)) {
+    selectedId = tabState[chart].selectedId;
+    applyHighlight(bloodline(selectedId));
+    openDetail(selectedId);
+  } else {
+    applyFilters();
+  }
+
+  // URL routing — quiet, no scroll.
+  const hash = chart === 'baremetal' ? '#chart=baremetal' : '';
+  if (location.hash !== hash) history.replaceState(null, '', location.pathname + location.search + hash);
+}
+
+function renderTabs() {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.chart === activeChart);
+    t.setAttribute('aria-selected', t.dataset.chart === activeChart ? 'true' : 'false');
+  });
+}
+
+function updateMasthead() {
+  const C = CHARTS[activeChart];
+  document.title = C.title + ' · ' + C.subtitle.replace(/\.$/, '');
+  const titleEl = document.querySelector('h1.title');
+  const subEl   = document.querySelector('p.subtitle');
+  const deckEl  = document.querySelector('p.deck');
+  const statsEl = document.getElementById('colophonStats');
+  const noteEl  = document.getElementById('colophonNote');
+  if (activeChart === 'genealogy') {
+    titleEl.innerHTML = 'Houses <span class="amp">&amp;</span> Bloodlines';
+    subEl.textContent = 'An operating-system genealogy, 1969–2026.';
+    deckEl.innerHTML = 'One hundred and ten lineages in nine houses. Solid lines mark direct descent; dashed, conceptual inheritance. Hover any bar to trace its bloodline; click for the history.';
+    statsEl.innerHTML = `
+      <li><strong>110</strong><span>entries</span></li>
+      <li><strong>9</strong><span>houses</span></li>
+      <li><strong>57</strong><span>years of feuding</span></li>`;
+    noteEl.innerHTML = 'Curated, opinionated, <br>non-exhaustive by design.';
+  } else {
+    titleEl.innerHTML = 'The Bare Metal <span class="amp">·</span> Houses';
+    subEl.textContent = 'Land of the Machines · 1967–2026.';
+    deckEl.innerHTML = 'Forty-five systems in three houses, plus the shared ancestors that haunt them. Hypervisors, container substrates, unikernels — the layer most users never see.';
+    statsEl.innerHTML = `
+      <li><strong>44</strong><span>entries</span></li>
+      <li><strong>3</strong><span>houses</span></li>
+      <li><strong>59</strong><span>years of metal</span></li>`;
+    noteEl.innerHTML = 'A sister chart, <br>read it from below.';
+  }
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => setChart(t.dataset.chart));
+});
+
+window.addEventListener('hashchange', () => {
+  const m = location.hash.match(/chart=(\w+)/);
+  const want = (m && CHARTS[m[1]]) ? m[1] : 'genealogy';
+  if (want !== activeChart) setChart(want);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  LEGEND (per-tab footer)
 // ═══════════════════════════════════════════════════════════════════
 
 const legendGrid = document.getElementById('legendGrid');
-HOUSE_ORDER.forEach(h => {
-  const HC = HOUSES[h];
-  // Count only non-movement entries so house counts match the default chart.
-  const count = OSES.filter(o => o.house === h && !o.movement).length;
-  const row = document.createElement('div');
-  row.className = 'legend-row';
-  row.innerHTML = `
-    <div class="legend-swatch" style="background:${HC.color};"></div>
-    <div>
-      <p class="legend-name">${HC.name} <span class="legend-id">· ${count} entries</span></p>
-      <p class="legend-motto">${HC.motto}</p>
-    </div>
-  `;
-  legendGrid.appendChild(row);
-});
+const cladeGrid  = document.getElementById('cladeGrid');
 
-const cladeGrid = document.getElementById('cladeGrid');
-CLADE_ORDER.forEach(k => {
-  const CL = CLADES[k];
-  const count = OSES.filter(o => o.movement && o.clade === k).length;
-  const row = document.createElement('div');
-  row.className = 'clade-row';
-  row.innerHTML = `
-    <div class="clade-swatch" style="background:${CL.accent};"></div>
-    <div>
-      <p class="clade-name">${CL.name} <span class="count">· ${count}</span></p>
-      <p class="clade-motto">${CL.motto}</p>
-    </div>
-  `;
-  cladeGrid.appendChild(row);
-});
+function renderLegend() {
+  clearChildren(legendGrid);
+  clearChildren(cladeGrid);
+  const C = CHARTS[activeChart];
+  for (const h of C.houseOrder) {
+    if (h === 'ancestors') continue;
+    const HC = C.houses[h];
+    const count = OSES.filter(o => chartOf(o) === activeChart && o.house === h && (activeChart === 'baremetal' || !o.movement)).length;
+    const row = document.createElement('div');
+    row.className = 'legend-row';
+    row.innerHTML = `
+      <div class="legend-swatch" style="background:${HC.color};"></div>
+      <div>
+        <p class="legend-name">${HC.name} <span class="legend-id">· ${count} entries</span></p>
+        <p class="legend-motto">${HC.motto}</p>
+      </div>`;
+    legendGrid.appendChild(row);
+  }
+  for (const k of C.cladeOrder) {
+    const CL = C.clades[k];
+    const count = OSES.filter(o => chartOf(o) === activeChart && o.clade === k).length;
+    const row = document.createElement('div');
+    row.className = 'clade-row';
+    row.innerHTML = `
+      <div class="clade-swatch" style="background:${CL.accent};"></div>
+      <div>
+        <p class="clade-name">${CL.name} <span class="count">· ${count}</span></p>
+        <p class="clade-motto">${CL.motto}</p>
+      </div>`;
+    cladeGrid.appendChild(row);
+  }
+  // Section heading + sub-line reflect active chart.
+  const cs = document.getElementById('cladeSection');
+  if (activeChart === 'baremetal') {
+    cs.querySelector('h3').textContent = 'The Clades of the Bare Metal';
+    cs.querySelector('.clade-sub').textContent = 'Sub-groupings inside the three houses.';
+  } else {
+    cs.querySelector('h3').textContent = 'The Free Peoples';
+    cs.querySelector('.clade-sub').textContent = 'A confederation, not a house — orthogonal membership.';
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 //  INITIAL RENDER
 // ═══════════════════════════════════════════════════════════════════
-applyFilters();
+
+const _initialMatch = location.hash.match(/chart=(\w+)/);
+const _initialChart = (_initialMatch && CHARTS[_initialMatch[1]]) ? _initialMatch[1] : 'genealogy';
+renderHouseChips();
+renderLayerToggle();
+renderTabs();
+renderLegend();
+updateMasthead();
+if (_initialChart !== 'genealogy') setChart(_initialChart);
+else applyFilters();
 
 </script>
 
