@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Houses &amp; Bloodlines · An Operating System Genealogy, 1969–2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0c0a07;
+    --bg-2:      #14110c;
+    --panel:     #161310;
+    --panel-2:   #1c1813;
+    --text:      #e8e3d6;
+    --text-2:    #c9c3b3;
+    --muted:     #8a8373;
+    --faint:     #5a5447;
+    --rule:      rgba(232, 227, 214, 0.10);
+    --rule-2:    rgba(232, 227, 214, 0.18);
+    --accent:    #d4a64a;
+    --accent-2:  #5eead4;
+
+    --c-mainframe: #d4a64a;
+    --c-unix:      #5eead4;
+    --c-bsd:       #67e8f9;
+    --c-linux:     #86efac;
+    --c-apple:     #fda4af;
+    --c-dos:       #fdba74;
+    --c-nt:        #93c5fd;
+    --c-altpc:     #c4b5fd;
+    --c-mobile:    #f0abfc;
+
+    --serif-display: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+    --serif-body:    'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+    --mono:          'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--serif-body);
+    font-size: 17px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    /* subtle paper grain */
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(212, 166, 74, 0.045), transparent 60%),
+      radial-gradient(circle at 80% 90%, rgba(94, 234, 212, 0.035), transparent 60%);
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ MASTHEAD                                                  │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .masthead {
+    border-bottom: 1px solid var(--rule-2);
+    padding: 36px 48px 28px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: end;
+  }
+  .masthead .titleblock {
+    max-width: 900px;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .kicker::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: var(--accent);
+  }
+  h1.title {
+    font-family: var(--serif-display);
+    font-weight: 500;
+    font-style: italic;
+    font-size: 64px;
+    line-height: 1.02;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  h1.title .amp {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--text-2);
+    margin: 4px 0 0;
+    font-weight: 400;
+  }
+  .deck {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 18px;
+    max-width: 700px;
+    font-style: italic;
+  }
+  .colophon {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    border-left: 1px solid var(--rule);
+    padding-left: 20px;
+    min-width: 200px;
+  }
+  .colophon strong { color: var(--text-2); font-weight: 500; }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ CONTROL BAR                                               │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .controls {
+    padding: 16px 48px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    backdrop-filter: blur(8px);
+  }
+  .ctrl-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: -8px;
+  }
+  .houses { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    color: var(--text-2);
+    padding: 6px 11px 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-radius: 1px;
+  }
+  .chip:hover { background: var(--panel); color: var(--text); }
+  .chip.active { color: var(--bg); font-weight: 600; }
+  .chip[data-house="mainframe"].active { background: var(--c-mainframe); border-color: var(--c-mainframe); }
+  .chip[data-house="unix"].active      { background: var(--c-unix);      border-color: var(--c-unix); }
+  .chip[data-house="bsd"].active       { background: var(--c-bsd);       border-color: var(--c-bsd); }
+  .chip[data-house="linux"].active     { background: var(--c-linux);     border-color: var(--c-linux); }
+  .chip[data-house="apple"].active     { background: var(--c-apple);     border-color: var(--c-apple); }
+  .chip[data-house="dos"].active       { background: var(--c-dos);       border-color: var(--c-dos); }
+  .chip[data-house="nt"].active        { background: var(--c-nt);        border-color: var(--c-nt); }
+  .chip[data-house="altpc"].active     { background: var(--c-altpc);     border-color: var(--c-altpc); }
+  .chip[data-house="mobile"].active    { background: var(--c-mobile);    border-color: var(--c-mobile); }
+  .chip-all.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  .search {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--rule-2);
+    padding: 6px 12px;
+    background: var(--bg);
+  }
+  .search:focus-within { border-color: var(--accent); }
+  .search input {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    width: 200px;
+  }
+  .search input::placeholder { color: var(--muted); }
+  .search .icon {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ CHART AREA                                                │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .chart-wrap {
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-bottom: 1px solid var(--rule-2);
+    background:
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
+    cursor: default;
+  }
+  /* custom scrollbar */
+  .chart-wrap::-webkit-scrollbar { height: 10px; }
+  .chart-wrap::-webkit-scrollbar-track { background: var(--bg-2); }
+  .chart-wrap::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 0; }
+  .chart-wrap::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  svg#chart {
+    display: block;
+    user-select: none;
+  }
+
+  /* SVG element styles via class */
+  .axis-line { stroke: var(--rule-2); stroke-width: 1; fill: none; }
+  .axis-tick { stroke: var(--rule-2); stroke-width: 1; }
+  .axis-tick.major { stroke: var(--rule-2); }
+  .axis-label {
+    fill: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .axis-label.major { fill: var(--text-2); font-size: 11px; font-weight: 500; }
+
+  .house-band {
+    fill: var(--rule);
+    opacity: 0.5;
+  }
+  .house-band-alt {
+    fill: transparent;
+  }
+  .house-rule { stroke: var(--rule); stroke-width: 1; }
+  .house-label {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 16px;
+    fill: var(--text-2);
+  }
+  .house-label-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    fill: var(--muted);
+  }
+  .house-label-motto {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 11.5px;
+    fill: var(--muted);
+  }
+
+  .lineage-line {
+    fill: none;
+    stroke-width: 1.2;
+    opacity: 0.32;
+    pointer-events: none;
+    transition: opacity 0.18s ease, stroke-width 0.18s ease;
+  }
+  .lineage-line.dashed { stroke-dasharray: 3 3; opacity: 0.22; }
+  .lineage-line.dim { opacity: 0.06; }
+  .lineage-line.highlight { opacity: 1; stroke-width: 1.8; }
+  .lineage-line.highlight.dashed { opacity: 0.9; }
+
+  .os-bar-group { cursor: pointer; }
+  .os-bar-bg { fill: var(--panel-2); transition: fill 0.15s ease; }
+  .os-bar {
+    fill-opacity: 0.18;
+    stroke-width: 1;
+    transition: fill-opacity 0.15s ease, stroke-width 0.15s ease;
+  }
+  .os-bar-group:hover .os-bar { fill-opacity: 0.34; stroke-width: 1.5; }
+  .os-bar-group.selected .os-bar { fill-opacity: 0.5; stroke-width: 1.8; }
+  .os-bar-group.dim { opacity: 0.18; }
+  .os-bar-group.lineage .os-bar { fill-opacity: 0.42; stroke-width: 1.6; }
+
+  .os-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    fill: var(--text);
+    pointer-events: none;
+    dominant-baseline: middle;
+  }
+  .os-label-end {
+    text-anchor: end;
+  }
+  .os-arrow-cap {
+    fill-opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ DETAIL PANEL                                              │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .detail-rail {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background: var(--panel);
+    border-left: 1px solid var(--rule-2);
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow-y: auto;
+    z-index: 50;
+    padding: 36px 32px 40px;
+  }
+  .detail-rail.open { transform: translateX(0); }
+  .detail-rail::-webkit-scrollbar { width: 6px; }
+  .detail-rail::-webkit-scrollbar-track { background: var(--panel); }
+  .detail-rail::-webkit-scrollbar-thumb { background: var(--faint); }
+
+  .detail-close {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .detail-close:hover { color: var(--text); }
+
+  .detail-house-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .detail-house-id::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .detail-name {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 44px;
+    line-height: 1.05;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .detail-company {
+    font-family: var(--serif-body);
+    font-size: 16px;
+    color: var(--text-2);
+    margin: 0 0 24px;
+    font-style: italic;
+  }
+  .detail-dates {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .detail-dates .big {
+    font-size: 28px;
+    color: var(--text);
+    font-family: var(--serif-display);
+    font-style: italic;
+    letter-spacing: 0;
+  }
+  .detail-dates .span {
+    margin: 0 12px;
+    color: var(--faint);
+  }
+  .detail-status {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border: 1px solid var(--rule-2);
+    color: var(--muted);
+  }
+  .detail-status.active { color: var(--accent); border-color: var(--accent); }
+
+  .detail-note {
+    font-family: var(--serif-body);
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    color: var(--text);
+  }
+  .detail-note::first-letter {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 38px;
+    float: left;
+    line-height: 0.9;
+    margin: 4px 8px 0 0;
+    color: var(--accent);
+  }
+
+  .detail-section {
+    margin-bottom: 24px;
+  }
+  .detail-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .detail-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .detail-list li {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 0;
+    cursor: pointer;
+    color: var(--text-2);
+    transition: color 0.12s ease;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .detail-list li:hover { color: var(--accent); }
+  .detail-list li .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transform: translateY(1px);
+  }
+  .detail-list li .rel {
+    color: var(--faint);
+    font-size: 10px;
+    margin-left: auto;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .detail-list li.empty {
+    color: var(--faint);
+    font-style: italic;
+    font-family: var(--serif-body);
+    font-size: 14px;
+    padding: 4px 0;
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ LEGEND / FOOTER                                           │
+     ╰─────────────────────────────────────────────────────────╯ */
+  .footer-section {
+    padding: 40px 48px 60px;
+    max-width: 1100px;
+    border-top: 1px solid var(--rule);
+  }
+  .footer-section h2 {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 28px;
+    margin: 0 0 18px;
+  }
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px 28px;
+    margin-bottom: 36px;
+  }
+  .legend-row {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-top: 4px;
+  }
+  .legend-name {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 17px;
+    margin: 0;
+  }
+  .legend-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .legend-motto {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--text-2);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  .reading-guide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+  .reading-guide h3 {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+    font-weight: 500;
+  }
+  .reading-guide p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-2);
+    margin: 0;
+  }
+
+  .footnote {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    line-height: 1.7;
+  }
+  .footnote a { color: var(--accent-2); text-decoration: none; }
+  .footnote a:hover { text-decoration: underline; }
+
+  /* small-screen graceful fallback */
+  @media (max-width: 720px) {
+    .masthead { padding: 24px 20px; grid-template-columns: 1fr; }
+    .colophon { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 16px; text-align: left; }
+    h1.title { font-size: 38px; }
+    .subtitle { font-size: 17px; }
+    .controls { padding: 12px 20px; gap: 10px; }
+    .footer-section { padding: 32px 20px 48px; }
+    .detail-rail { width: 100%; padding: 28px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="titleblock">
+    <div class="kicker">Vol. 1 · Codex of Operating Systems · ed. 2026</div>
+    <h1 class="title">Houses <span class="amp">&amp;</span> Bloodlines</h1>
+    <p class="subtitle">An operating-system genealogy, 1969–2026.</p>
+    <p class="deck">
+      One hundred and ten lineages in nine houses. Solid lines mark direct descent;
+      dashed, conceptual inheritance. Hover any bar to trace its bloodline;
+      click for the history.
+    </p>
+  </div>
+  <div class="colophon">
+    <strong>110</strong> entries<br>
+    <strong>9</strong> houses<br>
+    <strong>57</strong> years of feuding<br>
+    <span style="color: var(--faint);">───────────</span><br>
+    Curated, opinionated,<br>
+    non-exhaustive by design.
+  </div>
+</header>
+
+<nav class="controls">
+  <span class="ctrl-label">Houses</span>
+  <div class="houses" id="houseChips">
+    <button class="chip chip-all active" data-house="all">All</button>
+    <button class="chip" data-house="mainframe">Mainframe</button>
+    <button class="chip" data-house="unix">Unix</button>
+    <button class="chip" data-house="bsd">BSD</button>
+    <button class="chip" data-house="linux">Linux</button>
+    <button class="chip" data-house="apple">Cupertino</button>
+    <button class="chip" data-house="dos">DOS · Win9x</button>
+    <button class="chip" data-house="nt">Redmond</button>
+    <button class="chip" data-house="altpc">Exiles</button>
+    <button class="chip" data-house="mobile">Pocket</button>
+  </div>
+  <label class="search">
+    <span class="icon">⌕</span>
+    <input id="searchInput" type="text" placeholder="search for an OS…" autocomplete="off" spellcheck="false">
+  </label>
+</nav>
+
+<div class="chart-wrap" id="chartWrap">
+  <svg id="chart" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<aside class="detail-rail" id="detailRail">
+  <button class="detail-close" id="detailClose" aria-label="Close">✕</button>
+  <div id="detailContent"></div>
+</aside>
+
+<section class="footer-section">
+  <h2>The Houses</h2>
+  <div class="legend-grid" id="legendGrid"></div>
+
+  <div class="reading-guide">
+    <div>
+      <h3>How to Read</h3>
+      <p>Each horizontal bar runs from an operating system’s release year to its end of active development (or to today, if still living). Bars are stacked within each house to avoid overlap; the vertical order within a house carries no meaning.</p>
+    </div>
+    <div>
+      <h3>Lineage Lines</h3>
+      <p>Solid curves mark direct code or kernel descent. Dashed curves mark conceptual or clean-room inheritance — Linux from Minix, ReactOS from NT, FreeDOS from MS-DOS. Multiple parent lines converging on one child indicate a merger.</p>
+    </div>
+    <div>
+      <h3>What’s Missing</h3>
+      <p>Hundreds of operating systems. Hobby kernels, defunct experiments, regional variants, and most embedded RTOSes are absent on purpose. This is a constellation, not an atlas. For the atlas, see Eylenburg’s 1,300-entry family tree.</p>
+    </div>
+    <div>
+      <h3>Editorial Bias</h3>
+      <p>Notes lean dry-witty over neutral. Dates default to year of first general release; a few are contested. Where lineage is genuinely ambiguous (Linux’s debt to Minix, NT’s to VMS) the dashed line is the editorial compromise.</p>
+    </div>
+  </div>
+
+  <p class="footnote">
+    Drawn from public history at <a href="https://en.wikipedia.org/wiki/Timeline_of_operating_systems" target="_blank" rel="noopener">Wikipedia</a>,
+    <a href="https://eylenburg.github.io/os_familytree.htm" target="_blank" rel="noopener">Eylenburg’s OS Family Tree</a>,
+    Salus’s <em>A Quarter Century of Unix</em>, and <em>Showstopper!</em> by Zachary.
+    Errors and contested datings remain the editor’s.
+  </p>
+</section>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════════
+
+const HOUSES = {
+  mainframe: { name: 'House Mainframe',  short: 'Mainframe',  color: '#d4a64a',
+    motto: 'Old kingdoms, still humming in the basement.' },
+  unix:      { name: 'House Unix',       short: 'Unix',       color: '#5eead4',
+    motto: 'From Murray Hill, a thousand schisms.' },
+  bsd:       { name: 'House Berkeley',   short: 'BSD',        color: '#67e8f9',
+    motto: 'Free as the bay fog. Forked accordingly.' },
+  linux:     { name: 'House Linux',      short: 'Linux',      color: '#86efac',
+    motto: 'A peasants’ kernel that ate the world.' },
+  apple:     { name: 'House Cupertino',  short: 'Apple',      color: '#fda4af',
+    motto: 'Twice-born: Lisa’s heir, NeXT’s revenant.' },
+  dos:       { name: 'House CP/M-DOS',   short: 'DOS · Win9x', color: '#fdba74',
+    motto: '640K, a prompt, and an empire by accident.' },
+  nt:        { name: 'House Redmond',    short: 'NT · Windows', color: '#93c5fd',
+    motto: 'VMS bones, OS/2 skin, Cutler’s grudges.' },
+  altpc:     { name: 'House of Exiles',  short: 'Alt PC',      color: '#c4b5fd',
+    motto: 'Amiga, Atari, BeOS — the pretender courts.' },
+  mobile:    { name: 'House Pocket',     short: 'Mobile · Embedded', color: '#f0abfc',
+    motto: 'Crowns small enough to fit in a pocket.' },
+};
+
+const OSES = [
+  // ─── MAINFRAME ───────────────────────────────────────────────
+  { id:'multics', name:'Multics',          house:'mainframe', born:1969, ended:2000, parents:[], company:'MIT · Bell Labs · GE',
+    note:'The cathedral that Bell Labs walked out of. Inspired Unix as much by its excesses as its ideas.' },
+  { id:'os360',   name:'OS/360',           house:'mainframe', born:1966, ended:1972, parents:[], company:'IBM',
+    note:'Brooks’ mythical man-month given form. The first true mainframe operating system family.' },
+  { id:'dos360',  name:'DOS/360',          house:'mainframe', born:1966, ended:1972, parents:[], company:'IBM',
+    note:'Smaller sibling to OS/360. Began the VSE bloodline.' },
+  { id:'vm370',   name:'VM/370',           house:'mainframe', born:1972, ended:1981, parents:[{id:'os360',rel:'inspired'}], company:'IBM',
+    note:'Virtual machines, before "virtualization" had a marketing budget.' },
+  { id:'mvs',     name:'MVS',              house:'mainframe', born:1974, ended:1995, parents:[{id:'os360',rel:'derived'}], company:'IBM',
+    note:'Multiple Virtual Storage. The throne room of 1980s enterprise computing.' },
+  { id:'vse',     name:'DOS/VSE',          house:'mainframe', born:1979, ended:1990, parents:[{id:'dos360',rel:'derived'}], company:'IBM',
+    note:'The cadet branch — smaller machines, smaller budgets, same lineage.' },
+  { id:'os390',   name:'OS/390',           house:'mainframe', born:1995, ended:2002, parents:[{id:'mvs',rel:'derived'}], company:'IBM',
+    note:'MVS, repackaged for the integration age.' },
+  { id:'zos',     name:'z/OS',             house:'mainframe', born:2000, ended:null, parents:[{id:'os390',rel:'derived'}], company:'IBM',
+    note:'Still runs the world’s banks and airlines. The throne never abdicated, only outsourced.' },
+  { id:'zvm',     name:'z/VM',             house:'mainframe', born:2000, ended:null, parents:[{id:'vm370',rel:'derived'}], company:'IBM',
+    note:'Hosts thousands of Linux guests on a single mainframe — a strange dynastic alliance.' },
+  { id:'zvse',    name:'z/VSE',            house:'mainframe', born:2005, ended:null, parents:[{id:'vse',rel:'derived'}], company:'IBM',
+    note:'Last of the VSE line.' },
+
+  // ─── UNIX (research + commercial) ────────────────────────────
+  { id:'unixv1',  name:'Unix V1',          house:'unix', born:1971, ended:1975, parents:[{id:'multics',rel:'inspired'}], company:'Bell Labs',
+    note:'Thompson & Ritchie on a discarded PDP-7. The seed.' },
+  { id:'unixv6',  name:'Unix V6',          house:'unix', born:1975, ended:1979, parents:[{id:'unixv1',rel:'derived'}], company:'Bell Labs',
+    note:'First Unix to escape the Labs in earnest. Lions’ Commentary made it a samizdat textbook.' },
+  { id:'unixv7',  name:'Unix V7',          house:'unix', born:1979, ended:1984, parents:[{id:'unixv6',rel:'derived'}], company:'Bell Labs',
+    note:'"The last true Unix," say purists. The schism started here.' },
+  { id:'xenix',   name:'Xenix',            house:'unix', born:1980, ended:1989, parents:[{id:'unixv7',rel:'derived'}], company:'Microsoft · SCO',
+    note:'Microsoft was, briefly, the world’s largest Unix vendor. History rarely repeats but it rhymes.' },
+  { id:'sysIII',  name:'UNIX System III',  house:'unix', born:1981, ended:1983, parents:[{id:'unixv7',rel:'derived'}], company:'AT&T',
+    note:'AT&T’s first commercial Unix release.' },
+  { id:'sysV',    name:'UNIX System V',    house:'unix', born:1983, ended:1989, parents:[{id:'sysIII',rel:'derived'}], company:'AT&T',
+    note:'The Roman line. SVR4 would later try to reunify the fractured kingdoms.' },
+  { id:'sunos',   name:'SunOS',            house:'unix', born:1982, ended:1994, parents:[{id:'bsd42',rel:'derived'}], company:'Sun Microsystems',
+    note:'Born in Berkeley colors, baptized in System V at Sun’s reluctant pivot.' },
+  { id:'hpux',    name:'HP-UX',            house:'unix', born:1984, ended:null, parents:[{id:'sysV',rel:'derived'}], company:'Hewlett-Packard',
+    note:'Itanium’s last living dependent.' },
+  { id:'aix',     name:'AIX',              house:'unix', born:1986, ended:null, parents:[{id:'sysV',rel:'derived'}], company:'IBM',
+    note:'IBM’s Unix. POWER hardware’s constant companion.' },
+  { id:'irix',    name:'IRIX',             house:'unix', born:1988, ended:2006, parents:[{id:'sysV',rel:'derived'}], company:'Silicon Graphics',
+    note:'Once ran Jurassic Park’s VFX. The Hollywood Unix.' },
+  { id:'minix',   name:'Minix',            house:'unix', born:1987, ended:null, parents:[{id:'unixv7',rel:'inspired'}], company:'Andrew Tanenbaum',
+    note:'A teaching Unix, written from scratch. Linus read this code first.' },
+  { id:'svr4',    name:'UNIX SVR4',        house:'unix', born:1988, ended:1992,
+    parents:[{id:'sysV',rel:'derived'},{id:'bsd43',rel:'merge'},{id:'sunos',rel:'merge'},{id:'xenix',rel:'merge'}],
+    company:'AT&T · Sun',
+    note:'The grand alliance. Unified four Unix dialects — and split the world into the Unix Wars.' },
+  { id:'solaris', name:'Solaris',          house:'unix', born:1992, ended:null,
+    parents:[{id:'sunos',rel:'derived'},{id:'svr4',rel:'merge'}], company:'Sun · Oracle',
+    note:'Solaris 10 introduced DTrace and ZFS — gifts the rest of computing is still unwrapping.' },
+  { id:'plan9',   name:'Plan 9',           house:'unix', born:1992, ended:null, parents:[{id:'unixv7',rel:'inspired'}], company:'Bell Labs',
+    note:'What Unix should have been, written by the same people. Beautiful, beloved, ignored.' },
+  { id:'qnx',     name:'QNX',              house:'unix', born:1982, ended:null, parents:[{id:'unixv7',rel:'inspired'}], company:'QSSL · BlackBerry',
+    note:'A microkernel Unix that quietly conquered cars, nuclear plants, and the Hubble.' },
+
+  // ─── BSD ─────────────────────────────────────────────────────
+  { id:'bsd1',     name:'1BSD',             house:'bsd', born:1978, ended:1979, parents:[{id:'unixv6',rel:'derived'}], company:'UC Berkeley',
+    note:'Bill Joy mails out tapes from his grad office. The Berkeley line begins.' },
+  { id:'bsd42',    name:'4.2BSD',           house:'bsd', born:1983, ended:1986, parents:[{id:'bsd1',rel:'derived'}], company:'UC Berkeley',
+    note:'TCP/IP, Fast File System, vi, sockets — the toolkit of the internet age.' },
+  { id:'bsd43',    name:'4.3BSD',           house:'bsd', born:1986, ended:1994, parents:[{id:'bsd42',rel:'derived'}], company:'UC Berkeley',
+    note:'The mature reference. Everyone copied it. AT&T sued.' },
+  { id:'bsd44',    name:'4.4BSD-Lite',      house:'bsd', born:1994, ended:1995, parents:[{id:'bsd43',rel:'derived'}], company:'UC Berkeley',
+    note:'After the USL v. BSDi settlement: a clean-room BSD that anyone could fork. And everyone did.' },
+  { id:'bsd386',   name:'386BSD',           house:'bsd', born:1992, ended:1994, parents:[{id:'bsd43',rel:'derived'}], company:'Jolitz et al.',
+    note:'The PC port that begat NetBSD and FreeBSD. The Jolitzes left, the children continued.' },
+  { id:'bsdi',     name:'BSD/OS',           house:'bsd', born:1991, ended:2003, parents:[{id:'bsd43',rel:'derived'}], company:'BSDi',
+    note:'The defendant in USL v. BSDi. Survived the suit, died of irrelevance.' },
+  { id:'netbsd',   name:'NetBSD',           house:'bsd', born:1993, ended:null, parents:[{id:'bsd386',rel:'derived'}], company:'NetBSD Foundation',
+    note:'"Of course it runs NetBSD." Toasters and supercomputers both.' },
+  { id:'freebsd',  name:'FreeBSD',          house:'bsd', born:1993, ended:null, parents:[{id:'bsd386',rel:'derived'}], company:'FreeBSD Foundation',
+    note:'The pragmatic BSD. Quietly powers Netflix CDNs, PlayStations, and WhatsApp.' },
+  { id:'openbsd',  name:'OpenBSD',          house:'bsd', born:1996, ended:null, parents:[{id:'netbsd',rel:'derived'}], company:'Theo de Raadt et al.',
+    note:'Schism over manners. Begat OpenSSH, LibreSSL, and a famously dour mascot.' },
+  { id:'dragonfly',name:'DragonFly BSD',    house:'bsd', born:2003, ended:null, parents:[{id:'freebsd',rel:'derived'}], company:'Matt Dillon et al.',
+    note:'A schism over SMP architecture. HAMMER filesystem its legacy.' },
+
+  // ─── APPLE / NEXT / DARWIN ───────────────────────────────────
+  { id:'lisaos',   name:'Lisa OS',          house:'apple', born:1983, ended:1986, parents:[], company:'Apple',
+    note:'The first Mac in spirit. Killed by its own price and its smaller, cheaper sibling.' },
+  { id:'system1',  name:'Mac System 1',     house:'apple', born:1984, ended:1991, parents:[{id:'lisaos',rel:'inspired'}], company:'Apple',
+    note:'1984. Cooperative multitasking and a single floppy. The GUI canon begins.' },
+  { id:'system7',  name:'System 7',         house:'apple', born:1991, ended:1997, parents:[{id:'system1',rel:'derived'}], company:'Apple',
+    note:'Color, virtual memory, Apple-event scripting. The peak of the classic line.' },
+  { id:'macos8',   name:'Mac OS 8',         house:'apple', born:1997, ended:1999, parents:[{id:'system7',rel:'derived'}], company:'Apple',
+    note:'Renamed to keep clone-makers out. The Copland salvage.' },
+  { id:'macos9',   name:'Mac OS 9',         house:'apple', born:1999, ended:2002, parents:[{id:'macos8',rel:'derived'}], company:'Apple',
+    note:'The end of the classic line. Steve Jobs delivered a eulogy onstage.' },
+  { id:'mach',     name:'Mach',             house:'apple', born:1985, ended:1994, parents:[{id:'bsd42',rel:'inspired'}], company:'Carnegie Mellon',
+    note:'A microkernel research project that became the heart of NeXT, then Apple.' },
+  { id:'nextstep', name:'NeXTSTEP',         house:'apple', born:1989, ended:1995,
+    parents:[{id:'mach',rel:'derived'},{id:'bsd43',rel:'merge'}], company:'NeXT',
+    note:'Jobs in exile. Object-oriented from the kernel up. Tim Berners-Lee wrote the Web on one.' },
+  { id:'openstep', name:'OPENSTEP',         house:'apple', born:1994, ended:1997, parents:[{id:'nextstep',rel:'derived'}], company:'NeXT · Sun',
+    note:'The portable API spec that survived NeXT and crossed back into Cupertino in 1997.' },
+  { id:'darwin',   name:'Darwin',           house:'apple', born:2000, ended:null,
+    parents:[{id:'openstep',rel:'derived'},{id:'bsd44',rel:'merge'}], company:'Apple',
+    note:'The open-source core of every Apple OS since. Hidden kingmaker.' },
+  { id:'macosx',   name:'Mac OS X · macOS', house:'apple', born:2001, ended:null,
+    parents:[{id:'darwin',rel:'derived'},{id:'macos9',rel:'inspired'}], company:'Apple',
+    note:'The two bloodlines married. Classic UX over NeXT internals.' },
+  { id:'ios',      name:'iPhone OS · iOS',  house:'apple', born:2007, ended:null, parents:[{id:'macosx',rel:'derived'}], company:'Apple',
+    note:'A laptop in your palm, sold a billion times. The most consequential fork in this chart.' },
+  { id:'watchos',  name:'watchOS',          house:'apple', born:2015, ended:null, parents:[{id:'ios',rel:'derived'}], company:'Apple',
+    note:'The wrist court.' },
+  { id:'tvos',     name:'tvOS',             house:'apple', born:2015, ended:null, parents:[{id:'ios',rel:'derived'}], company:'Apple',
+    note:'The living-room court.' },
+  { id:'ipados',   name:'iPadOS',           house:'apple', born:2019, ended:null, parents:[{id:'ios',rel:'derived'}], company:'Apple',
+    note:'A nominal independence. The branch most likely to reunite with macOS.' },
+  { id:'visionos', name:'visionOS',         house:'apple', born:2024, ended:null, parents:[{id:'ipados',rel:'derived'}], company:'Apple',
+    note:'The newest, smallest court. May not outlive its early adopters.' },
+
+  // ─── LINUX ───────────────────────────────────────────────────
+  { id:'linux',    name:'Linux kernel',     house:'linux', born:1991, ended:null,
+    parents:[{id:'minix',rel:'inspired'},{id:'unixv7',rel:'inspired'}], company:'Linus Torvalds et al.',
+    note:'"Just a hobby, won’t be big and professional like gnu." It was both.' },
+  { id:'slackware',name:'Slackware',        house:'linux', born:1993, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Patrick Volkerding',
+    note:'The oldest surviving distribution. Run by one man, on principle.' },
+  { id:'debian',   name:'Debian',           house:'linux', born:1993, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Debian Project',
+    note:'The social-contract distro. Parliamentary, slow, durable.' },
+  { id:'suse',     name:'S.u.S.E.',         house:'linux', born:1994, ended:null, parents:[{id:'slackware',rel:'derived'}], company:'SUSE',
+    note:'European enterprise Linux. Survived three corporate ownerships and counting.' },
+  { id:'redhat',   name:'Red Hat Linux',    house:'linux', born:1995, ended:2003, parents:[{id:'linux',rel:'derived'}], company:'Red Hat',
+    note:'The brand that made Linux respectable in boardrooms. Split into RHEL and Fedora in 2003.' },
+  { id:'mandrake', name:'Mandrake · Mandriva', house:'linux', born:1998, ended:2011, parents:[{id:'redhat',rel:'derived'}], company:'Mandriva',
+    note:'KDE-first, beginner-friendly. A casualty of the 2000s distro shakeout.' },
+  { id:'gentoo',   name:'Gentoo',           house:'linux', born:2002, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Gentoo Foundation',
+    note:'Compile everything yourself. A reputation problem and a religion.' },
+  { id:'arch',     name:'Arch Linux',       house:'linux', born:2002, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Arch Linux',
+    note:'Rolling release, ruthless minimalism. The wiki outshines the OS.' },
+  { id:'fedora',   name:'Fedora',           house:'linux', born:2003, ended:null, parents:[{id:'redhat',rel:'derived'}], company:'Red Hat · IBM',
+    note:'Red Hat’s upstream laboratory. Most of what RHEL eventually ships passes through here.' },
+  { id:'rhel',     name:'RHEL',             house:'linux', born:2003, ended:null, parents:[{id:'redhat',rel:'derived'}], company:'Red Hat · IBM',
+    note:'The corporate Linux. Every cloud is full of it.' },
+  { id:'centos',   name:'CentOS',           house:'linux', born:2004, ended:2021, parents:[{id:'rhel',rel:'derived'}], company:'CentOS Project · Red Hat',
+    note:'A free RHEL rebuild that ran half the internet. Killed by IBM’s grip; reborn as Rocky and Alma.' },
+  { id:'ubuntu',   name:'Ubuntu',           house:'linux', born:2004, ended:null, parents:[{id:'debian',rel:'derived'}], company:'Canonical',
+    note:'"Linux for human beings." Won the desktop, then the cloud.' },
+  { id:'mint',     name:'Linux Mint',       house:'linux', born:2006, ended:null, parents:[{id:'ubuntu',rel:'derived'}], company:'Linux Mint',
+    note:'Ubuntu with the rough edges sanded. The default refugee distro after every Unity / GNOME 3 wave.' },
+  { id:'android',  name:'Android',          house:'linux', born:2008, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Google · OHA',
+    note:'A Linux kernel under a Java runtime. The largest-deployed OS on Earth.' },
+  { id:'chromeos', name:'ChromeOS',         house:'linux', born:2009, ended:null, parents:[{id:'gentoo',rel:'derived'}], company:'Google',
+    note:'Gentoo bones, Chrome face. Educational dominance.' },
+  { id:'rocky',    name:'Rocky Linux',      house:'linux', born:2021, ended:null,
+    parents:[{id:'centos',rel:'derived'},{id:'rhel',rel:'inspired'}], company:'RESF',
+    note:'Founded by CentOS’s original creator on the day CentOS died.' },
+
+  // ─── CP/M, DOS, Win9x ────────────────────────────────────────
+  { id:'cpm',      name:'CP/M',             house:'dos', born:1974, ended:1991, parents:[], company:'Digital Research',
+    note:'Kildall’s 8-bit standard. Almost ran the IBM PC. History pivots on a single missed meeting.' },
+  { id:'cpm86',    name:'CP/M-86',          house:'dos', born:1981, ended:1991, parents:[{id:'cpm',rel:'derived'}], company:'Digital Research',
+    note:'The IBM-PC port that lost. Listed at $240 next to PC DOS at $40.' },
+  { id:'qdos',     name:'86-DOS · QDOS',    house:'dos', born:1980, ended:1981, parents:[{id:'cpm',rel:'inspired'}], company:'Seattle Computer',
+    note:'Tim Paterson’s "Quick and Dirty OS." Microsoft bought it for $75,000. The rest is litigation.' },
+  { id:'msdos',    name:'MS-DOS',           house:'dos', born:1981, ended:2000, parents:[{id:'qdos',rel:'derived'}], company:'Microsoft',
+    note:'The OS that funded the empire. C:\\>' },
+  { id:'pcdos',    name:'PC DOS',           house:'dos', born:1981, ended:2003, parents:[{id:'qdos',rel:'derived'}], company:'IBM',
+    note:'IBM’s rebadge. Continued long after MS-DOS in embedded niches.' },
+  { id:'drdos',    name:'DR-DOS',           house:'dos', born:1988, ended:null, parents:[{id:'cpm',rel:'derived'}], company:'Digital Research · Caldera',
+    note:'The DOS that wasn’t Microsoft’s. Antitrust history hinges on its sabotage.' },
+  { id:'freedos',  name:'FreeDOS',          house:'dos', born:1994, ended:null, parents:[{id:'msdos',rel:'inspired'}], company:'Jim Hall et al.',
+    note:'A clean-room DOS that outlived both MS-DOS and PC DOS. BIOS flashers still ship with it.' },
+  { id:'win1',     name:'Windows 1.0',      house:'dos', born:1985, ended:1988, parents:[{id:'msdos',rel:'derived'}], company:'Microsoft',
+    note:'A tiled shell over DOS. Mocked at the time, vindicated by every subsequent year.' },
+  { id:'win3',     name:'Windows 3.x',      house:'dos', born:1990, ended:1995, parents:[{id:'win1',rel:'derived'}], company:'Microsoft',
+    note:'Sold ten million copies in two years. The empire’s tipping point.' },
+  { id:'win95',    name:'Windows 95',       house:'dos', born:1995, ended:2000, parents:[{id:'win3',rel:'derived'}], company:'Microsoft',
+    note:'Start menu, taskbar, Plug and Play, midnight launches. The Rolling Stones played the keynote.' },
+  { id:'win98',    name:'Windows 98',       house:'dos', born:1998, ended:2006, parents:[{id:'win95',rel:'derived'}], company:'Microsoft',
+    note:'USB, FAT32, Internet Explorer welded on. Antitrust gathered evidence here.' },
+  { id:'winme',    name:'Windows ME',       house:'dos', born:2000, ended:2006, parents:[{id:'win98',rel:'derived'}], company:'Microsoft',
+    note:'The end of the DOS line. Universally regretted.' },
+
+  // ─── WINDOWS NT lineage ──────────────────────────────────────
+  { id:'vms',      name:'OpenVMS',          house:'nt', born:1977, ended:null, parents:[], company:'DEC · HP · VSI',
+    note:'Cutler’s prior masterwork. Increment its letters and you get WNT. Old grudges run deep.' },
+  { id:'os2_1',    name:'OS/2 1.x',         house:'nt', born:1987, ended:1991, parents:[], company:'IBM · Microsoft',
+    note:'The shared dream of two empires. Microsoft walked out and took the architects with them.' },
+  { id:'nt31',     name:'Windows NT 3.1',   house:'nt', born:1993, ended:1995,
+    parents:[{id:'os2_1',rel:'derived'},{id:'vms',rel:'inspired'}], company:'Microsoft',
+    note:'Cutler’s revenge. A real 32-bit OS with a Windows 3.1 face.' },
+  { id:'nt4',      name:'Windows NT 4.0',   house:'nt', born:1996, ended:2004, parents:[{id:'nt31',rel:'derived'}], company:'Microsoft',
+    note:'NT puts on a Win 95 mask. Corporate adoption arrives.' },
+  { id:'win2k',    name:'Windows 2000',     house:'nt', born:2000, ended:2010, parents:[{id:'nt4',rel:'derived'}], company:'Microsoft',
+    note:'The first NT for business desktops at scale. Active Directory’s coming-out.' },
+  { id:'winxp',    name:'Windows XP',       house:'nt', born:2001, ended:2014,
+    parents:[{id:'win2k',rel:'derived'},{id:'winme',rel:'merge'}], company:'Microsoft',
+    note:'The DOS and NT lines fused at last. Beloved past all reason. Resisted retirement for 13 years.' },
+  { id:'vista',    name:'Windows Vista',    house:'nt', born:2007, ended:2017, parents:[{id:'winxp',rel:'derived'}], company:'Microsoft',
+    note:'A rewrite the press never forgave. UAC, kernel hardening, WDDM — all the unloved load-bearing parts.' },
+  { id:'win7',     name:'Windows 7',        house:'nt', born:2009, ended:2020, parents:[{id:'vista',rel:'derived'}], company:'Microsoft',
+    note:'Vista, redeemed. The last universally-loved Windows.' },
+  { id:'win8',     name:'Windows 8 · 8.1',  house:'nt', born:2012, ended:2023, parents:[{id:'win7',rel:'derived'}], company:'Microsoft',
+    note:'A tablet OS welded to a desktop OS. The Start menu’s wilderness years.' },
+  { id:'win10',    name:'Windows 10',       house:'nt', born:2015, ended:null, parents:[{id:'win8',rel:'derived'}], company:'Microsoft',
+    note:'"The last version of Windows." It wasn’t.' },
+  { id:'win11',    name:'Windows 11',       house:'nt', born:2021, ended:null, parents:[{id:'win10',rel:'derived'}], company:'Microsoft',
+    note:'Centered taskbar, TPM mandates, AI annexations. The succession is messy.' },
+  { id:'wince',    name:'Windows CE',       house:'nt', born:1996, ended:2018, parents:[{id:'nt31',rel:'inspired'}], company:'Microsoft',
+    note:'A separate kernel for handhelds. Tried again and again.' },
+  { id:'winmobile',name:'Windows Mobile · Phone', house:'nt', born:2003, ended:2017, parents:[{id:'wince',rel:'derived'}], company:'Microsoft',
+    note:'Three rewrites, three retreats. iOS and Android closed the gate.' },
+
+  // ─── ALT PC (the exiles) ─────────────────────────────────────
+  { id:'os2_2',    name:'OS/2 2.0',         house:'altpc', born:1992, ended:1996, parents:[{id:'os2_1',rel:'derived'}], company:'IBM',
+    note:'IBM alone. "A better DOS than DOS, a better Windows than Windows." Not enough.' },
+  { id:'os2warp',  name:'OS/2 Warp',        house:'altpc', born:1994, ended:2006, parents:[{id:'os2_2',rel:'derived'}], company:'IBM',
+    note:'IBM’s last home-PC stand. Quietly ran ATMs and check-in kiosks for decades after.' },
+  { id:'arcaos',   name:'ArcaOS',           house:'altpc', born:2017, ended:null, parents:[{id:'os2warp',rel:'derived'}], company:'Arca Noae',
+    note:'A licensed continuation of OS/2 Warp. The pretender court still meets.' },
+  { id:'amigaos',  name:'AmigaOS',          house:'altpc', born:1985, ended:null, parents:[], company:'Commodore · Hyperion',
+    note:'Preemptive multitasking on a 7 MHz machine in 1985. The future ran out of money.' },
+  { id:'atarit',   name:'Atari TOS',        house:'altpc', born:1985, ended:1995, parents:[], company:'Atari · Digital Research',
+    note:'A GEM-based shell over a custom kernel. Cheap, fast, doomed.' },
+  { id:'riscos',   name:'RISC OS',          house:'altpc', born:1987, ended:null, parents:[], company:'Acorn · RISC OS Open',
+    note:'A whole OS in 4 MB of ROM. Beloved in British schools. Now open-source.' },
+  { id:'beos',     name:'BeOS',             house:'altpc', born:1995, ended:2001, parents:[], company:'Be Inc.',
+    note:'Multimedia OS with a famous file system. Apple nearly bought it instead of NeXT.' },
+  { id:'haiku',    name:'Haiku',            house:'altpc', born:2001, ended:null, parents:[{id:'beos',rel:'derived'}], company:'Haiku Inc.',
+    note:'A clean-room BeOS reimplementation. Still in beta, still ticking.' },
+  { id:'reactos',  name:'ReactOS',          house:'altpc', born:1996, ended:null, parents:[{id:'nt4',rel:'inspired'}], company:'ReactOS Project',
+    note:'A clean-room Windows NT clone. Permanently almost-ready.' },
+
+  // ─── MOBILE / EMBEDDED ───────────────────────────────────────
+  { id:'palmos',   name:'Palm OS',          house:'mobile', born:1996, ended:2009, parents:[], company:'Palm Inc.',
+    note:'The PDA throne, briefly. Tap Graffiti, watch a market form.' },
+  { id:'symbian',  name:'Symbian · EPOC',   house:'mobile', born:1997, ended:2014, parents:[], company:'Psion · Symbian Ltd · Nokia',
+    note:'Ran half the world’s phones until the iPhone landed. A textbook in slow institutional collapse.' },
+  { id:'bbos',     name:'BlackBerry OS',    house:'mobile', born:1999, ended:2022, parents:[], company:'RIM · BlackBerry',
+    note:'The CrackBerry years. Obamas, prime ministers, traders. Killed by glass slabs.' },
+  { id:'webos',    name:'webOS',            house:'mobile', born:2009, ended:null,
+    parents:[{id:'palmos',rel:'inspired'},{id:'linux',rel:'derived'}], company:'Palm · HP · LG',
+    note:'The mobile OS that should have won. Now sold inside televisions.' },
+  { id:'bada',     name:'Bada',             house:'mobile', born:2010, ended:2013, parents:[], company:'Samsung',
+    note:'A Samsung-only OS. Folded into Tizen.' },
+  { id:'tizen',    name:'Tizen',            house:'mobile', born:2012, ended:null,
+    parents:[{id:'bada',rel:'merge'},{id:'linux',rel:'derived'}], company:'Linux Foundation · Samsung',
+    note:'Watches, TVs, refrigerators. Not phones.' },
+  { id:'bb10',     name:'BlackBerry 10',    house:'mobile', born:2013, ended:2018,
+    parents:[{id:'qnx',rel:'derived'},{id:'bbos',rel:'inspired'}], company:'BlackBerry',
+    note:'QNX under the hood. Beautiful, late, doomed.' },
+  { id:'firefoxos',name:'Firefox OS',       house:'mobile', born:2013, ended:2016, parents:[{id:'linux',rel:'derived'}], company:'Mozilla',
+    note:'Web apps as the entire OS. Discontinued; the idea survives in feature phones.' },
+  { id:'kaios',    name:'KaiOS',            house:'mobile', born:2017, ended:null, parents:[{id:'firefoxos',rel:'derived'}], company:'KaiOS Technologies',
+    note:'Firefox OS, reborn for the JioPhone era. Hundreds of millions of feature-phone seats.' },
+  { id:'harmonyos',name:'HarmonyOS',        house:'mobile', born:2019, ended:null, parents:[{id:'linux',rel:'derived'}], company:'Huawei',
+    note:'Began as Android-adjacent under sanctions. HarmonyOS NEXT (2024) drops Linux entirely. The newest schism.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  CONFIG & LAYOUT
+// ═══════════════════════════════════════════════════════════════════
+
+const CURRENT_YEAR = 2026;
+const YEAR_MIN = 1966;
+const YEAR_MAX = 2027;
+const PX_PER_YEAR = 24;
+const MARGIN_LEFT = 220;
+const MARGIN_RIGHT = 60;
+const MARGIN_TOP = 56;
+const MARGIN_BOTTOM = 24;
+
+const ROW_HEIGHT = 30;
+const ROW_GAP = 4;
+const HOUSE_PAD_TOP = 22;
+const HOUSE_PAD_BOTTOM = 16;
+const BAR_HEIGHT = 22;
+
+const HOUSE_ORDER = ['mainframe','unix','bsd','apple','dos','nt','altpc','linux','mobile'];
+// Ordered so that lineage lines flow as cleanly as possible:
+// mainframe → unix → bsd → apple (BSD→Mach lineage)
+// dos → nt → altpc (DOS to NT to OS/2)
+// linux at bottom + mobile (Android, etc.)
+
+// ═══════════════════════════════════════════════════════════════════
+//  PACKING — assign each OS a row within its house
+// ═══════════════════════════════════════════════════════════════════
+
+function buildIndex() {
+  const byId = new Map(OSES.map(o => [o.id, o]));
+  // build children map for fast lookup
+  const childrenOf = new Map();
+  for (const os of OSES) childrenOf.set(os.id, []);
+  for (const os of OSES) {
+    for (const p of os.parents) {
+      if (childrenOf.has(p.id)) childrenOf.get(p.id).push({id: os.id, rel: p.rel});
+    }
+  }
+  return { byId, childrenOf };
+}
+
+const { byId, childrenOf } = buildIndex();
+
+function packHouses() {
+  const layouts = {};
+  for (const house of HOUSE_ORDER) {
+    const oses = OSES
+      .filter(o => o.house === house)
+      .sort((a, b) => a.born - b.born || a.id.localeCompare(b.id));
+    const rowsLastEnd = []; // last endYear in each row
+    for (const os of oses) {
+      const endY = (os.ended ?? CURRENT_YEAR) + 1; // +1 buffer so adjacent don't overlap
+      let placed = false;
+      for (let i = 0; i < rowsLastEnd.length; i++) {
+        if (rowsLastEnd[i] < os.born) {
+          os._row = i;
+          rowsLastEnd[i] = endY;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        os._row = rowsLastEnd.length;
+        rowsLastEnd.push(endY);
+      }
+    }
+    layouts[house] = { rows: Math.max(1, rowsLastEnd.length), oses };
+  }
+  return layouts;
+}
+
+const layouts = packHouses();
+
+// Compute house Y offsets
+function computeHouseGeometry() {
+  let y = MARGIN_TOP;
+  const houseY = {};
+  for (const h of HOUSE_ORDER) {
+    const rows = layouts[h].rows;
+    const bandHeight = HOUSE_PAD_TOP + rows * (BAR_HEIGHT + ROW_GAP) - ROW_GAP + HOUSE_PAD_BOTTOM;
+    houseY[h] = { top: y, bottom: y + bandHeight, height: bandHeight, rows };
+    y = y + bandHeight;
+  }
+  return { houseY, totalHeight: y + MARGIN_BOTTOM };
+}
+
+const { houseY, totalHeight } = computeHouseGeometry();
+
+function yearToX(year) {
+  return MARGIN_LEFT + (year - YEAR_MIN) * PX_PER_YEAR;
+}
+function osBarRect(os) {
+  const x1 = yearToX(os.born);
+  const x2 = yearToX((os.ended ?? CURRENT_YEAR));
+  const houseInfo = houseY[os.house];
+  const y = houseInfo.top + HOUSE_PAD_TOP + os._row * (BAR_HEIGHT + ROW_GAP);
+  return { x: x1, y, w: Math.max(8, x2 - x1), h: BAR_HEIGHT, cx: (x1+x2)/2, cy: y + BAR_HEIGHT/2 };
+}
+
+const totalWidth = yearToX(YEAR_MAX) + MARGIN_RIGHT;
+
+// ═══════════════════════════════════════════════════════════════════
+//  SVG RENDERING
+// ═══════════════════════════════════════════════════════════════════
+
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('chart');
+svg.setAttribute('width', totalWidth);
+svg.setAttribute('height', totalHeight);
+svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+
+function el(tag, attrs={}, parent=svg) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// — house bands —
+const bandsG = el('g', { class: 'bands' });
+HOUSE_ORDER.forEach((h, i) => {
+  const info = houseY[h];
+  el('rect', {
+    x: 0, y: info.top, width: totalWidth, height: info.height,
+    class: i % 2 === 0 ? 'house-band' : 'house-band-alt',
+    'data-house-band': h,
+  }, bandsG);
+  // house top rule
+  el('line', {
+    x1: 0, y1: info.top, x2: totalWidth, y2: info.top, class: 'house-rule'
+  }, bandsG);
+});
+// final bottom rule
+el('line', {
+  x1: 0, y1: totalHeight - MARGIN_BOTTOM, x2: totalWidth, y2: totalHeight - MARGIN_BOTTOM,
+  class: 'house-rule'
+}, bandsG);
+
+// — house labels —
+const labelsG = el('g', { class: 'house-labels' });
+HOUSE_ORDER.forEach(h => {
+  const info = houseY[h];
+  const HC = HOUSES[h];
+  const cy = info.top + info.height / 2;
+  el('text', {
+    x: 24, y: cy - 14, class: 'house-label-id', fill: HC.color
+  }, labelsG).textContent = HC.short.toUpperCase();
+  el('text', {
+    x: 24, y: cy + 5, class: 'house-label'
+  }, labelsG).textContent = HC.name;
+  el('text', {
+    x: 24, y: cy + 24, class: 'house-label-motto'
+  }, labelsG).textContent = HC.motto;
+});
+
+// — year axis (top + bottom) —
+function renderAxis(y, isTop) {
+  const g = el('g', { class: 'axis' });
+  el('line', {
+    x1: MARGIN_LEFT, y1: y, x2: yearToX(YEAR_MAX), y2: y,
+    class: 'axis-line'
+  }, g);
+  for (let yr = 1970; yr <= 2026; yr += 5) {
+    const x = yearToX(yr);
+    const major = yr % 10 === 0;
+    el('line', {
+      x1: x, y1: y - (major ? 6 : 3), x2: x, y2: y + (major ? 6 : 3),
+      class: 'axis-tick' + (major ? ' major' : '')
+    }, g);
+    if (major || yr % 5 === 0) {
+      el('text', {
+        x, y: isTop ? y - 12 : y + 20,
+        'text-anchor': 'middle',
+        class: 'axis-label' + (major ? ' major' : '')
+      }, g).textContent = yr;
+    }
+  }
+  return g;
+}
+renderAxis(MARGIN_TOP - 24, true);
+renderAxis(totalHeight - MARGIN_BOTTOM + 14, false);
+
+// — vertical decade rules (subtle) —
+const decadeG = el('g', { class: 'decade-rules' });
+for (let yr = 1970; yr <= 2030; yr += 10) {
+  const x = yearToX(yr);
+  el('line', {
+    x1: x, y1: MARGIN_TOP - 24, x2: x, y2: totalHeight - MARGIN_BOTTOM,
+    stroke: 'rgba(232,227,214,0.05)', 'stroke-width': 1
+  }, decadeG);
+}
+
+// — lineage lines (drawn before bars so bars sit on top) —
+const lineagesG = el('g', { class: 'lineages' });
+function lineageColor(childHouse) {
+  return HOUSES[childHouse].color;
+}
+function drawLineage(parent, child, rel) {
+  const pr = osBarRect(parent);
+  const cr = osBarRect(child);
+  const x1 = pr.x + pr.w;
+  const y1 = pr.y + pr.h / 2;
+  const x2 = cr.x;
+  const y2 = cr.y + cr.h / 2;
+  const dx = Math.max(20, (x2 - x1) * 0.45);
+  const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+  const line = el('path', {
+    d: path,
+    stroke: lineageColor(child.house),
+    class: 'lineage-line' + (rel === 'derived' ? '' : ' dashed'),
+    'data-parent': parent.id,
+    'data-child': child.id,
+    'data-rel': rel,
+  }, lineagesG);
+  return line;
+}
+
+const lineageLines = []; // {el, parentId, childId, rel}
+for (const os of OSES) {
+  for (const p of os.parents) {
+    const parent = byId.get(p.id);
+    if (!parent) continue;
+    const line = drawLineage(parent, os, p.rel);
+    lineageLines.push({ el: line, parentId: parent.id, childId: os.id, rel: p.rel });
+  }
+}
+
+// — bars —
+const barsG = el('g', { class: 'bars' });
+const barGroupById = new Map();
+for (const os of OSES) {
+  const r = osBarRect(os);
+  const house = HOUSES[os.house];
+
+  const g = el('g', { class: 'os-bar-group', 'data-id': os.id }, barsG);
+
+  // background (panel-tinted)
+  el('rect', {
+    x: r.x, y: r.y, width: r.w, height: r.h,
+    class: 'os-bar-bg'
+  }, g);
+
+  // tinted fill
+  el('rect', {
+    x: r.x, y: r.y, width: r.w, height: r.h,
+    class: 'os-bar',
+    fill: house.color, stroke: house.color
+  }, g);
+
+  // arrow cap if still alive
+  if (os.ended === null) {
+    const ax = r.x + r.w;
+    const ay = r.y + r.h / 2;
+    el('path', {
+      d: `M ${ax} ${ay - 5} L ${ax + 8} ${ay} L ${ax} ${ay + 5} Z`,
+      fill: house.color,
+      class: 'os-arrow-cap'
+    }, g);
+  }
+
+  // label inside (truncated if bar is wide enough) else at end
+  const label = os.name;
+  // text width heuristic: 6.2px per char in JetBrains Mono at 10.5px
+  const approxTextW = label.length * 6.4 + 12;
+  if (r.w >= approxTextW + 6) {
+    el('text', {
+      x: r.x + 7, y: r.y + r.h / 2,
+      class: 'os-label',
+      fill: 'var(--text)'
+    }, g).textContent = label;
+  } else if (r.w >= 30) {
+    // short label inside, full label at end
+    el('text', {
+      x: r.x + r.w + 8, y: r.y + r.h / 2,
+      class: 'os-label',
+      fill: 'var(--text-2)'
+    }, g).textContent = label;
+  } else {
+    // very short bar — full label to the right
+    el('text', {
+      x: r.x + r.w + 8, y: r.y + r.h / 2,
+      class: 'os-label',
+      fill: 'var(--text-2)'
+    }, g).textContent = label;
+  }
+
+  barGroupById.set(os.id, g);
+
+  g.addEventListener('mouseenter', () => onBarHover(os.id, true));
+  g.addEventListener('mouseleave', () => onBarHover(os.id, false));
+  g.addEventListener('click', (ev) => { ev.stopPropagation(); onBarClick(os.id); });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INTERACTION
+// ═══════════════════════════════════════════════════════════════════
+
+let selectedId = null;
+let filterHouse = 'all';
+let searchTerm = '';
+
+function getAncestors(id, set = new Set()) {
+  const os = byId.get(id);
+  if (!os) return set;
+  for (const p of os.parents) {
+    if (!set.has(p.id)) {
+      set.add(p.id);
+      getAncestors(p.id, set);
+    }
+  }
+  return set;
+}
+function getDescendants(id, set = new Set()) {
+  for (const c of childrenOf.get(id) || []) {
+    if (!set.has(c.id)) {
+      set.add(c.id);
+      getDescendants(c.id, set);
+    }
+  }
+  return set;
+}
+
+function bloodline(id) {
+  const set = new Set([id]);
+  for (const x of getAncestors(id)) set.add(x);
+  for (const x of getDescendants(id)) set.add(x);
+  return set;
+}
+
+function applyHighlight(highlightSet) {
+  // bars
+  for (const [id, g] of barGroupById) {
+    g.classList.remove('selected', 'lineage', 'dim');
+    if (!highlightSet) {
+      // no highlight: clear all
+    } else if (id === selectedId) {
+      g.classList.add('selected');
+    } else if (highlightSet.has(id)) {
+      g.classList.add('lineage');
+    } else {
+      g.classList.add('dim');
+    }
+  }
+  // lineage lines
+  for (const ln of lineageLines) {
+    ln.el.classList.remove('highlight', 'dim');
+    if (!highlightSet) continue;
+    const inHighlight = highlightSet.has(ln.parentId) && highlightSet.has(ln.childId);
+    if (inHighlight) ln.el.classList.add('highlight');
+    else ln.el.classList.add('dim');
+  }
+}
+
+function clearHighlight() {
+  for (const [, g] of barGroupById) g.classList.remove('selected', 'lineage', 'dim');
+  for (const ln of lineageLines) ln.el.classList.remove('highlight', 'dim');
+  applyFilters(); // re-apply filters after clearing highlight
+}
+
+let hoverTimeout = null;
+function onBarHover(id, isEntering) {
+  if (selectedId) return; // no hover-highlight while a selection is active
+  if (isEntering) {
+    applyHighlight(bloodline(id));
+  } else {
+    // small delay before clearing to avoid jitter
+    clearTimeout(hoverTimeout);
+    hoverTimeout = setTimeout(clearHighlight, 80);
+  }
+}
+
+function onBarClick(id) {
+  if (selectedId === id) {
+    selectedId = null;
+    closeDetail();
+    clearHighlight();
+    return;
+  }
+  selectedId = id;
+  applyHighlight(bloodline(id));
+  openDetail(id);
+  // scroll to bring bar into view
+  const os = byId.get(id);
+  const r = osBarRect(os);
+  const wrap = document.getElementById('chartWrap');
+  const desiredScroll = r.x - wrap.clientWidth / 2 + r.w / 2;
+  wrap.scrollTo({ left: Math.max(0, desiredScroll), behavior: 'smooth' });
+}
+
+document.getElementById('chartWrap').addEventListener('click', (ev) => {
+  // click on empty area deselects
+  if (ev.target === svg || ev.target.closest('.bands') || ev.target.closest('.house-labels')) {
+    if (selectedId) {
+      selectedId = null;
+      closeDetail();
+      clearHighlight();
+    }
+  }
+});
+
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape') {
+    if (selectedId) {
+      selectedId = null;
+      closeDetail();
+      clearHighlight();
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════════════════════════════
+
+const detailRail = document.getElementById('detailRail');
+const detailContent = document.getElementById('detailContent');
+document.getElementById('detailClose').addEventListener('click', () => {
+  selectedId = null;
+  closeDetail();
+  clearHighlight();
+});
+
+function closeDetail() { detailRail.classList.remove('open'); }
+
+function openDetail(id) {
+  const os = byId.get(id);
+  const house = HOUSES[os.house];
+  const parents = os.parents.map(p => ({ os: byId.get(p.id), rel: p.rel })).filter(x => x.os);
+  const children = (childrenOf.get(id) || []).map(c => ({ os: byId.get(c.id), rel: c.rel })).filter(x => x.os);
+  const ended = os.ended ?? CURRENT_YEAR;
+  const span = ended - os.born;
+  const status = os.ended === null ? 'still alive' : `ended ${os.ended}`;
+
+  detailContent.innerHTML = `
+    <div class="detail-house-id" style="--dot:${house.color};">
+      <span style="background:${house.color}; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+      ${house.name}
+    </div>
+    <h2 class="detail-name">${os.name}</h2>
+    <div class="detail-company">${os.company}</div>
+    <div class="detail-dates">
+      <span class="big">${os.born}</span><span class="span">—</span><span class="big">${os.ended ?? '·····'}</span>
+      <div class="detail-status ${os.ended === null ? 'active' : ''}">${status} · ${span} years</div>
+    </div>
+    <p class="detail-note">${os.note}</p>
+
+    <div class="detail-section">
+      <div class="detail-section-label">Descended from</div>
+      <ul class="detail-list">
+        ${parents.length === 0
+          ? '<li class="empty">A house founder. No prior lineage in this chart.</li>'
+          : parents.map(p => `
+            <li data-jump="${p.os.id}">
+              <span class="dot" style="background:${HOUSES[p.os.house].color};"></span>
+              ${p.os.name}
+              <span class="rel">${p.rel}</span>
+            </li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-label">Begat</div>
+      <ul class="detail-list">
+        ${children.length === 0
+          ? '<li class="empty">No descendants in this chart.</li>'
+          : children.map(c => `
+            <li data-jump="${c.os.id}">
+              <span class="dot" style="background:${HOUSES[c.os.house].color};"></span>
+              ${c.os.name}
+              <span class="rel">${c.rel}</span>
+            </li>`).join('')}
+      </ul>
+    </div>
+  `;
+
+  // wire up "jump to" links
+  detailContent.querySelectorAll('[data-jump]').forEach(li => {
+    li.addEventListener('click', () => {
+      const jumpId = li.getAttribute('data-jump');
+      onBarClick(jumpId);
+    });
+  });
+
+  detailRail.classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FILTERS & SEARCH
+// ═══════════════════════════════════════════════════════════════════
+
+function applyFilters() {
+  for (const [id, g] of barGroupById) {
+    const os = byId.get(id);
+    let visible = true;
+    if (filterHouse !== 'all' && os.house !== filterHouse) visible = false;
+    if (searchTerm && !os.name.toLowerCase().includes(searchTerm) && !os.company.toLowerCase().includes(searchTerm)) {
+      visible = false;
+    }
+    g.style.opacity = visible ? '' : '0.15';
+    g.style.pointerEvents = visible ? '' : 'none';
+  }
+  // dim lineage lines whose endpoints are filtered out
+  for (const ln of lineageLines) {
+    const pOs = byId.get(ln.parentId);
+    const cOs = byId.get(ln.childId);
+    let visible = true;
+    if (filterHouse !== 'all' && pOs.house !== filterHouse && cOs.house !== filterHouse) visible = false;
+    ln.el.style.opacity = visible ? '' : '0.05';
+  }
+}
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    filterHouse = chip.getAttribute('data-house');
+    applyFilters();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', (ev) => {
+  searchTerm = ev.target.value.trim().toLowerCase();
+  applyFilters();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  LEGEND
+// ═══════════════════════════════════════════════════════════════════
+
+const legendGrid = document.getElementById('legendGrid');
+HOUSE_ORDER.forEach(h => {
+  const HC = HOUSES[h];
+  const count = OSES.filter(o => o.house === h).length;
+  const row = document.createElement('div');
+  row.className = 'legend-row';
+  row.innerHTML = `
+    <div class="legend-swatch" style="background:${HC.color};"></div>
+    <div>
+      <p class="legend-name">${HC.name} <span class="legend-id">· ${count} entries</span></p>
+      <p class="legend-motto">${HC.motto}</p>
+    </div>
+  `;
+  legendGrid.appendChild(row);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  INITIAL RENDER
+// ═══════════════════════════════════════════════════════════════════
+applyFilters();
+
+</script>
+
+</body>
+</html>
