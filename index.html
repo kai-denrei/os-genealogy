@@ -2,8 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Houses &amp; Bloodlines · An Operating System Genealogy, 1969–2026</title>
+<meta name="description" content="One hundred and ten operating systems across nine houses, 1969–2026. Solid lines mark direct descent; dashed, conceptual inheritance.">
+<meta name="theme-color" content="#0c0a07">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Houses &amp; Bloodlines">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="Houses &amp; Bloodlines">
+<meta property="og:description" content="An operating-system genealogy, 1969–2026.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -65,6 +78,7 @@
   }
   .masthead .titleblock {
     max-width: 900px;
+    min-width: 0; /* allow grid item to shrink below content's intrinsic width */
   }
   .kicker {
     font-family: var(--mono);
@@ -125,7 +139,27 @@
     padding-left: 20px;
     min-width: 200px;
   }
-  .colophon strong { color: var(--text-2); font-weight: 500; }
+  .colophon-stats {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .colophon-stats li {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    align-items: baseline;
+  }
+  .colophon-stats strong { color: var(--text-2); font-weight: 500; }
+  .colophon-stats span { color: var(--muted); }
+  .colophon-note {
+    margin: 12px 0 0;
+    padding-top: 12px;
+    border-top: 1px dotted var(--faint);
+  }
 
   /* ╭─────────────────────────────────────────────────────────╮
      │ CONTROL BAR                                               │
@@ -567,15 +601,213 @@
   .footnote a { color: var(--accent-2); text-decoration: none; }
   .footnote a:hover { text-decoration: underline; }
 
-  /* small-screen graceful fallback */
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ STICKY HOUSE LABELS                                       │
+     │ A backdrop rectangle that translates with horizontal      │
+     │ scroll so house labels stay legible. JS handles transform.│
+     ╰─────────────────────────────────────────────────────────╯ */
+  .sticky-bg {
+    fill: var(--bg);
+    fill-opacity: 0.86;
+  }
+  .sticky-fade {
+    pointer-events: none;
+  }
+  .chart-wrap {
+    /* allow vertical page scroll while panning chart horizontally */
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ MOBILE — tablet and below                                 │
+     ╰─────────────────────────────────────────────────────────╯ */
   @media (max-width: 720px) {
-    .masthead { padding: 24px 20px; grid-template-columns: 1fr; }
-    .colophon { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 16px; text-align: left; }
+    body { font-size: 16px; }
+
+    .masthead {
+      padding: 28px 18px 22px;
+      padding-top: max(28px, env(safe-area-inset-top));
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .kicker {
+      display: block; /* override desktop flex so text wraps naturally */
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .kicker::before {
+      display: inline-block;
+      width: 18px;
+      vertical-align: middle;
+      margin-right: 10px;
+      margin-bottom: 2px;
+    }
+    h1.title { font-size: 46px; line-height: 0.98; letter-spacing: -0.02em; }
+    .subtitle { font-size: 19px; }
+    .deck { font-size: 15px; margin-top: 14px; max-width: 100%; }
+
+    .colophon {
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+      padding: 16px 0 0;
+      text-align: left;
+      min-width: 0;
+      font-size: 10px;
+      line-height: 1.6;
+    }
+    .colophon-stats {
+      flex-direction: row;
+      gap: 22px;
+      margin-bottom: 12px;
+    }
+    .colophon-stats li {
+      justify-content: flex-start;
+      flex-direction: column;
+      gap: 1px;
+      align-items: flex-start;
+    }
+    .colophon-stats strong {
+      font-size: 20px;
+      font-family: var(--serif-display);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .colophon-stats span {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .colophon-note {
+      padding-top: 0;
+      border-top: 0;
+      margin: 0;
+      font-style: italic;
+      font-family: var(--serif-body);
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-2);
+    }
+    .colophon-note br { display: none; }
+
+    .controls {
+      padding: 12px 14px;
+      padding-left: max(14px, env(safe-area-inset-left));
+      padding-right: max(14px, env(safe-area-inset-right));
+      gap: 10px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .ctrl-label { display: none; }
+
+    .houses {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      margin: 0 -14px;
+      padding: 2px 14px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      gap: 8px;
+    }
+    .houses::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: 9px 13px 8px;
+      font-size: 11.5px;
+      min-height: 34px;
+    }
+
+    .search { margin-left: 0; width: 100%; padding: 9px 12px; }
+    .search input { width: 100%; font-size: 14px; }
+
+    .footer-section {
+      padding: 36px 18px 56px;
+      padding-left: max(18px, env(safe-area-inset-left));
+      padding-right: max(18px, env(safe-area-inset-right));
+      padding-bottom: max(56px, env(safe-area-inset-bottom));
+    }
+    .footer-section h2 { font-size: 26px; margin-bottom: 14px; }
+    .legend-grid { gap: 16px 22px; }
+    .legend-name { font-size: 16px; }
+    .legend-motto { font-size: 13px; }
+    .reading-guide { gap: 24px; padding-top: 24px; }
+
+    /* SVG: shrink house labels, hide mottoes on small screens */
+    .house-label { font-size: 13px; }
+    .house-label-id { font-size: 9px; letter-spacing: 0.16em; }
+    .house-label-motto { display: none; }
+
+    /* Detail rail → bottom sheet */
+    .detail-rail {
+      width: 100%;
+      height: 88vh;
+      height: 88dvh;
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule-2);
+      border-radius: 14px 14px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 30px 22px 24px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      box-shadow: 0 -24px 48px rgba(0, 0, 0, 0.55);
+    }
+    .detail-rail.open { transform: translateY(0); }
+    /* drag handle */
+    .detail-rail::before {
+      content: '';
+      position: absolute;
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--rule-2);
+    }
+    .detail-close {
+      top: 22px;
+      right: 18px;
+      padding: 10px;
+      font-size: 18px;
+    }
+    .detail-name { font-size: 34px; line-height: 1.04; }
+    .detail-company { font-size: 15px; margin-bottom: 20px; }
+    .detail-dates { margin-bottom: 20px; padding-bottom: 16px; }
+    .detail-dates .big { font-size: 24px; }
+    .detail-note { font-size: 16px; line-height: 1.55; margin-bottom: 24px; }
+    .detail-note::first-letter { font-size: 32px; margin: 3px 7px 0 0; }
+    .detail-list li { padding: 8px 0; font-size: 12.5px; }
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ MOBILE — phones                                           │
+     ╰─────────────────────────────────────────────────────────╯ */
+  @media (max-width: 480px) {
     h1.title { font-size: 38px; }
     .subtitle { font-size: 17px; }
-    .controls { padding: 12px 20px; gap: 10px; }
-    .footer-section { padding: 32px 20px 48px; }
-    .detail-rail { width: 100%; padding: 28px 22px; }
+    .deck { font-size: 14.5px; }
+    .colophon { grid-template-columns: 1fr 1fr; }
+    .colophon strong { font-size: 12px; }
+
+    .detail-name { font-size: 30px; }
+    .detail-rail { padding: 28px 18px 22px; }
+  }
+
+  /* ╭─────────────────────────────────────────────────────────╮
+     │ MOBILE — small phones                                     │
+     ╰─────────────────────────────────────────────────────────╯ */
+  @media (max-width: 360px) {
+    h1.title { font-size: 34px; }
+    .deck { display: none; } /* deck eats too much above-the-fold */
   }
 </style>
 </head>
@@ -593,12 +825,12 @@
     </p>
   </div>
   <div class="colophon">
-    <strong>110</strong> entries<br>
-    <strong>9</strong> houses<br>
-    <strong>57</strong> years of feuding<br>
-    <span style="color: var(--faint);">───────────</span><br>
-    Curated, opinionated,<br>
-    non-exhaustive by design.
+    <ul class="colophon-stats">
+      <li><strong>110</strong><span>entries</span></li>
+      <li><strong>9</strong><span>houses</span></li>
+      <li><strong>57</strong><span>years of feuding</span></li>
+    </ul>
+    <p class="colophon-note">Curated, opinionated, <br>non-exhaustive by design.</p>
   </div>
 </header>
 
@@ -1080,8 +1312,26 @@ el('line', {
   class: 'house-rule'
 }, bandsG);
 
-// — house labels —
+// — house labels (sticky column, repositioned by scroll listener below) —
 const labelsG = el('g', { class: 'house-labels' });
+// opaque backdrop — keeps labels legible when scrolled over bars
+el('rect', {
+  x: 0, y: 0, width: MARGIN_LEFT, height: totalHeight,
+  class: 'sticky-bg',
+  'pointer-events': 'all',
+}, labelsG);
+// gradient fade on the right edge so the column doesn't have a hard seam
+const defs = el('defs', {}, labelsG);
+const grad = el('linearGradient',
+  { id: 'sticky-fade-grad', x1: '0', x2: '1', y1: '0', y2: '0' }, defs);
+el('stop', { offset: '0%',   'stop-color': '#0c0a07', 'stop-opacity': '1' }, grad);
+el('stop', { offset: '100%', 'stop-color': '#0c0a07', 'stop-opacity': '0' }, grad);
+el('rect', {
+  x: MARGIN_LEFT, y: 0, width: 28, height: totalHeight,
+  fill: 'url(#sticky-fade-grad)',
+  class: 'sticky-fade',
+}, labelsG);
+
 HOUSE_ORDER.forEach(h => {
   const info = houseY[h];
   const HC = HOUSES[h];
@@ -1233,6 +1483,34 @@ for (const os of OSES) {
   g.addEventListener('mouseenter', () => onBarHover(os.id, true));
   g.addEventListener('mouseleave', () => onBarHover(os.id, false));
   g.addEventListener('click', (ev) => { ev.stopPropagation(); onBarClick(os.id); });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  STICKY HOUSE LABELS + INITIAL SCROLL
+// ═══════════════════════════════════════════════════════════════════
+
+// Move labels group to the top of the z-order so it sits above bars,
+// then translate it horizontally to track chart-wrap.scrollLeft.
+svg.appendChild(labelsG);
+
+const chartWrap = document.getElementById('chartWrap');
+let stickyRaf = 0;
+function updateStickyOverlay() {
+  stickyRaf = 0;
+  labelsG.setAttribute('transform', `translate(${chartWrap.scrollLeft}, 0)`);
+}
+chartWrap.addEventListener('scroll', () => {
+  if (stickyRaf) return;
+  stickyRaf = requestAnimationFrame(updateStickyOverlay);
+}, { passive: true });
+updateStickyOverlay();
+
+// On small screens, the leftmost years are obscure mainframes — land somewhere
+// recognizable so the page makes sense at first paint on a phone.
+if (window.matchMedia('(max-width: 720px)').matches) {
+  const initialTargetX = yearToX(1984) - 40;
+  chartWrap.scrollLeft = Math.max(0, initialTargetX);
+  updateStickyOverlay();
 }
 
 // ═══════════════════════════════════════════════════════════════════
